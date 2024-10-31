@@ -2,6 +2,7 @@
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const sendEmail = require('../utils/sendEmail'); // Import the sendEmail function
 
 const register = async (req, res) => {
   try {
@@ -25,6 +26,10 @@ const register = async (req, res) => {
 
     // Save user to DB
     await newUser.save();
+
+    // Send email on successful signup
+    const emailText = `Hi ${username},\n\nWelcome to Health Heaven! Your account has been created successfully.\n\nRegards,\nHealth Heaven Team`;
+    await sendEmail(email, 'Welcome to Health Heaven', emailText);
 
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
