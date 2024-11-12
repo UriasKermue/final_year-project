@@ -38,8 +38,8 @@ const Header = () => {
           <Button color="inherit" component={Link} to="/records">
             <FolderIcon style={iconStyle} /> Records
           </Button>
-          <Button color="inherit" component={Link} to="/metrics">
-            <BarChartIcon style={iconStyle} /> Metrics
+          <Button color="inherit" component={Link} to="/doctor">
+            <BarChartIcon style={iconStyle} /> Doctor
           </Button>
           <Button color="inherit" component={Link} to="/dashboard"> {/* Add Dashboard link */}
             <DashboardIcon style={iconStyle} /> Dashboard
