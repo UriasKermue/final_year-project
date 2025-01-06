@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Typography, TextField, Button, Grid, Box, Alert, Modal, CircularProgress } from '@mui/material';
 import axios from 'axios';
+import Avatar from '@mui/material/Avatar';
+
 
 const AppointmentScheduler = () => {
   const [appointmentData, setAppointmentData] = useState({
@@ -81,6 +83,12 @@ const AppointmentScheduler = () => {
     setLoading(true);
 
     try {
+      // Ensure that you pass the doctor's image URL in appointmentData
+      const doctor = doctors.find(d => d.name === appointmentData.doctorName);
+      if (doctor) {
+        appointmentData.doctorImage = doctor.imageURL; // Assuming imageURL is the key for the doctor's image
+      }
+
       const response = await axios.post('http://localhost:5000/api/appointments', appointmentData);
       setAppointments([...appointments, response.data]);
       setSuccess('Appointment scheduled successfully!');
@@ -97,17 +105,21 @@ const AppointmentScheduler = () => {
     } finally {
       setLoading(false);
     }
-  };
+};
+
 
   const handleDelete = async (appointmentId) => {
     try {
-      await axios.delete(`http://localhost:5000/api/appointments/${appointmentId}`);
-      setAppointments(appointments.filter((appointment) => appointment._id !== appointmentId));
-      setSuccess('Appointment deleted successfully!');
+        console.log(`Attempting to delete appointment with ID: ${appointmentId}`);
+        await axios.delete(`http://localhost:5000/api/appointments/${appointmentId}`);
+        setAppointments(appointments.filter((appointment) => appointment._id !== appointmentId));
+        setSuccess('Appointment deleted successfully!');
     } catch (err) {
-      setError('Failed to delete appointment. Please try again.');
+        console.error('Error deleting appointment:', err.response || err);
+        setError('Failed to delete appointment. Please try again.');
     }
-  };
+};
+
 
   const handleEdit = (appointment) => {
     setEditingAppointment(appointment);
@@ -250,35 +262,85 @@ const AppointmentScheduler = () => {
         </Button>
       </Box>
 
-      <Typography variant="h5" component="h2" gutterBottom sx={{ mt: 4 }}>
-        Your Appointments
-      </Typography>
+      <Typography variant="h5" component="h2" gutterBottom sx={{ mt: 4, fontWeight: 'bold', color: 'primary.main' }}>
+  Your Appointments
+</Typography>
 
-      {loading ? (
-        <Box display="flex" justifyContent="center" alignItems="center" sx={{ mt: 3 }}>
-          <CircularProgress />
-        </Box>
-      ) : (
-        <Box sx={{ mt: 2 }}>
-          {appointments.length === 0 ? (
-            <Typography variant="body1">No appointments scheduled.</Typography>
-          ) : (
-            <ul>
-              {appointments.map((appointment) => (
-                <li key={appointment._id}>
-                  <Typography variant="body1">
-                    <strong>{appointment.doctorName}</strong><br />
-                    {new Date(appointment.date).toLocaleString()}<br />
-                    <em>{appointment.notes}</em>
-                  </Typography>
-                  <Button variant="outlined" color="error" onClick={() => handleDelete(appointment._id)}>Cancel</Button>
-                  <Button variant="outlined" color="primary" onClick={() => handleEdit(appointment)}>Edit</Button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Box>
-      )}
+{loading ? (
+  <Box display="flex" justifyContent="center" alignItems="center" sx={{ mt: 3 }}>
+    <CircularProgress />
+  </Box>
+) : (
+  <Box sx={{ mt: 2 }}>
+    
+    {appointments.length === 0 ? (
+      <Typography variant="body1" sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
+        No appointments scheduled.
+      </Typography>
+    ) : (
+      <ul style={{ listStyleType: 'none', paddingLeft: 0 }}>
+        {appointments.map((appointment) => {
+          const date = new Date(appointment.date);
+          const formattedDate = date.toLocaleDateString('en-US');  // Date in MM/DD/YYYY format
+          const formattedTime = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });  // Time in 12-hour format with AM/PM
+
+          return (
+            <li
+              key={appointment._id}
+              style={{
+                marginBottom: '20px',
+                padding: '10px',
+                backgroundColor: '#f9f9f9',
+                borderRadius: '8px',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                {/* Doctor Image */}
+                <Avatar
+                  alt={appointment.doctorName}
+                  src={appointment.doctorImage} // Fallback to specified image
+                  sx={{ width: 60, height: 60 }}
+                />
+
+                <Typography variant="body1" sx={{ fontWeight: '500', color: 'text.primary' }}>
+                  <strong>{appointment.doctorName}</strong>
+                  <br />
+                  <span sx={{ fontSize: '0.9rem', color: 'text.secondary' }}>
+                    {formattedDate} at {formattedTime}
+                  </span>
+                  <br />
+                  <em sx={{ fontSize: '0.9rem', color: 'text.secondary' }}>{appointment.notes}</em>
+                </Typography>
+              </Box>
+
+              <Box sx={{ display: 'flex', gap: 2, marginTop: 1 }}>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  onClick={() => handleDelete(appointment._id)}
+                  sx={{ textTransform: 'none' }}
+                >
+                  Cancel
+                </Button>
+
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  onClick={() => handleEdit(appointment)}
+                  sx={{ textTransform: 'none' }}
+                >
+                  Edit
+                </Button>
+              </Box>
+            </li>
+          );
+        })}
+      </ul>
+    )}
+  </Box>
+)}
+
 
       {/* Edit Modal */}
       <Modal open={openEditModal} onClose={() => setOpenEditModal(false)}>

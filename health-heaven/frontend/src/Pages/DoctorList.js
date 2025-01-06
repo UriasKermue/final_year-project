@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Button } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 const DoctorList = () => {
   const [doctors, setDoctors] = useState([]); // Holds the doctor data
@@ -11,7 +13,7 @@ const DoctorList = () => {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/doctors'); // Update with your correct API endpoint
+        const response = await axios.get('http://localhost:5000/api/doctors'); // Correct API endpoint
         setDoctors(response.data); // Set doctors data
         setLoading(false); // Stop loading
       } catch (err) {
@@ -30,17 +32,17 @@ const DoctorList = () => {
 
   // Inline style objects
   const containerStyle = {
-    padding: '40px', // Increased padding around the entire container
+    padding: '40px',
     backgroundColor: '#f9f9f9',
-    maxWidth: '1200px', // Limit width of the container for better readability
-    margin: '0 auto', // Center the container
+    maxWidth: '1200px',
+    margin: '0 auto',
   };
 
   const doctorCardsStyle = {
     display: 'flex',
     flexWrap: 'wrap',
     gap: '20px',
-    justifyContent: 'space-evenly', // Space out the doctor cards evenly
+    justifyContent: 'space-evenly',
   };
 
   const doctorCardStyle = {
@@ -48,34 +50,24 @@ const DoctorList = () => {
     padding: '20px',
     borderRadius: '10px',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-    width: '280px', // Adjusted width for better layout
-    textAlign: 'center', // Center text in each card
+    width: '280px',
+    textAlign: 'center',
   };
 
   const doctorImageStyle = {
-    width: '100px',
-    height: '100px',
+    width: '120px',
+    height: '120px',
     borderRadius: '50%',
-    marginBottom: '15px', // Add some space between image and text
+    marginBottom: '15px',
   };
 
   const doctorInfoStyle = {
     marginTop: '10px',
-    textAlign: 'left', // Align text to the left for better readability
+    textAlign: 'left',
   };
 
   const buttonStyle = {
-    backgroundColor: '#007bff',
-    color: 'white',
-    border: 'none',
-    padding: '12px 20px', // Slightly bigger button for better interaction
-    borderRadius: '5px',
-    cursor: 'pointer',
-    marginTop: '10px', // Add spacing above the button
-  };
-
-  const buttonHoverStyle = {
-    backgroundColor: '#0056b3',
+    marginTop: '10px',
   };
 
   // If the component is loading, show a loading message
@@ -117,7 +109,7 @@ const DoctorList = () => {
           filteredDoctors.map((doctor) => (
             <div key={doctor._id} style={doctorCardStyle}>
               <img
-                src={doctor.photoUrl} // Ensure you have a photoUrl field in the doctor schema
+                src={doctor.imageUrl || 'https://via.placeholder.com/120'}
                 alt={doctor.name}
                 style={doctorImageStyle}
               />
@@ -127,14 +119,15 @@ const DoctorList = () => {
                 <p><strong>Location:</strong> {doctor.location}</p>
                 <p><strong>Experience:</strong> {doctor.experience} years</p>
                 <p><strong>Consultation Fees:</strong> ₹{doctor.consultationFees}</p>
-                <button
+                <Button
+                  variant="contained"
+                  color="primary"
+                  component={Link}
+                  to="/appointments"
                   style={buttonStyle}
-                  onMouseOver={(e) => (e.target.style.backgroundColor = buttonHoverStyle.backgroundColor)}
-                  onMouseOut={(e) => (e.target.style.backgroundColor = buttonStyle.backgroundColor)}
-                  onClick={() => alert(`Booking appointment with ${doctor.name}`)}
                 >
                   Book Appointment
-                </button>
+                </Button>
               </div>
             </div>
           ))

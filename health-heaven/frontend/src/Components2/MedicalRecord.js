@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
-import { Container, Typography, TextField, Button, Grid, FormControl, InputLabel, Select, MenuItem, InputAdornment, Box, Alert } from '@mui/material';
+import {
+  Container, Typography, TextField, Button, Grid, FormControl, InputLabel, 
+  Select, MenuItem, InputAdornment, Box, Alert
+} from '@mui/material';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import axios from 'axios';
 
-// Define a component for the file upload
+// Define a component for file upload
 const FileUpload = ({ onFileChange, fileName }) => (
   <Box mt={2}>
     <Button
@@ -32,101 +36,96 @@ const MedicalRecord = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const handleSave = () => {
-    // Basic validation
+  const handleSave = async () => {
     if (!recordTitle || !date || !category) {
       setError('Please fill in all required fields.');
       setSuccess('');
       return;
     }
 
-    // Clear error
-    setError('');
-    
-    // Handle the save functionality here
-    console.log('Record Title:', recordTitle);
-    console.log('Description:', description);
-    console.log('Date:', date);
-    console.log('Category:', category);
-    console.log('File:', file);
+    const formData = new FormData();
+    formData.append('recordTitle', recordTitle);
+    formData.append('description', description);
+    formData.append('date', date.toISOString());
+    formData.append('category', category);
+    if (file) {
+      formData.append('file', file);
+    }
 
-    // Show success message
-    setSuccess('Medical record saved successfully.');
+    try {
+      const response = await axios.post('http://localhost:5000/api/records', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setSuccess('Medical record saved successfully.');
+      setError('');
+    } catch (error) {
+      setError('Error saving medical record.');
+      setSuccess('');
+    }
   };
 
   return (
-    <Container>
-      <Typography 
-        variant="h4" 
-        gutterBottom 
-        align="center" 
-        sx={{ color:"primary", marginBottom: 3, paddingTop: 3 }}
-      >
+    <Container maxWidth="md" sx={{ mt: 5, p: 3, bgcolor: 'background.paper', borderRadius: 2, boxShadow: 3 }}>
+      <Typography variant="h4" align="center" gutterBottom>
         Manage Medical Records
       </Typography>
-
-      {/* Error and Success Messages */}
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
       {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
-
-      <Grid container spacing={4}>
-        <Grid item xs={12} md={6}>
+      
+      <Grid container spacing={3}>
+        <Grid item xs={12} sm={6}>
           <TextField
             label="Record Title"
             fullWidth
-            margin="normal"
             value={recordTitle}
             onChange={(e) => setRecordTitle(e.target.value)}
             required
           />
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} sm={6}>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DatePicker
               label="Date"
               value={date}
               onChange={(newDate) => setDate(newDate)}
-              renderInput={(params) => <TextField {...params} fullWidth margin="normal" required />}
+              renderInput={(params) => <TextField {...params} fullWidth required />}
             />
           </LocalizationProvider>
         </Grid>
+        <Grid item xs={12}>
+          <TextField
+            label="Description"
+            multiline
+            rows={4}
+            fullWidth
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <FormControl fullWidth required>
+            <InputLabel>Category</InputLabel>
+            <Select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            >
+              <MenuItem value="General">General</MenuItem>
+              <MenuItem value="Appointment">Appointment</MenuItem>
+              <MenuItem value="Prescriptions">Prescriptions</MenuItem>
+              <MenuItem value="Lab Results">Lab Results</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <FileUpload onFileChange={(file) => setFile(file)} fileName={file ? file.name : ''} />
+        </Grid>
       </Grid>
 
-      <TextField
-        label="Description"
-        multiline
-        rows={4}
-        fullWidth
-        margin="normal"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        placeholder="Describe the medical record (optional)"
-      />
-
-      <FormControl fullWidth margin="normal" required>
-        <InputLabel>Category</InputLabel>
-        <Select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          startAdornment={<InputAdornment position="start"></InputAdornment>}
-        >
-          <MenuItem value="General">General</MenuItem>
-          <MenuItem value="Appointment">Appointment</MenuItem>
-          <MenuItem value="Prescriptions">Prescriptions</MenuItem>
-          <MenuItem value="Lab Results">Lab Results</MenuItem>
-        </Select>
-      </FormControl>
-
-      <FileUpload onFileChange={(file) => setFile(file)} fileName={file ? file.name : ''} />
-
-      <Button
-        variant="contained"
-        color="primary"
-        sx={{ mt: 3 }}
-        onClick={handleSave}
-      >
-        Save Record
-      </Button>
+      <Box display="flex" justifyContent="center" mt={3}>
+        <Button variant="contained" color="primary" onClick={handleSave}>
+          Save Record
+        </Button>
+      </Box>
     </Container>
   );
 };

@@ -21,7 +21,9 @@ userSchema.methods.comparePassword = function(candidatePassword) {
 
 // Static method to find user by credentials
 userSchema.statics.findByCredentials = async (username, password) => {
-    const user = await this.findOne({ username }); // Use 'this' to refer to the model
+    const user = await User.findOne({ username }); // Correctly refer to User model here
+// Example for logging the user inside findByCredentials method
+console.log('Found User:', user);
 
     if (!user) {
         throw new Error('Unable to login');
