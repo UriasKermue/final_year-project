@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Container, Typography, TextField, Button, Box, Alert } from '@mui/material';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -33,10 +34,19 @@ const LoginPage = () => {
   };
 
   return (
-    <Container maxWidth="xs" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 8 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Log In
-      </Typography>
+    <Container maxWidth="xs" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 14 }}>
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: 'bold',
+            color: '#1976d2',
+            textTransform: 'uppercase',
+            letterSpacing: 2,
+            mb:2
+          }}
+        >
+          Healthify Solutions
+        </Typography>
       <Box
         component="form"
         onSubmit={handleLogin}
@@ -50,6 +60,9 @@ const LoginPage = () => {
           backgroundColor: '#fff',
         }}
       >
+        <div className='text-2xl font-bold mb-4 text-center text-align-center' >
+          Log In
+        </div>
         <TextField
           label="Username"
           variant="outlined"
@@ -79,6 +92,15 @@ const LoginPage = () => {
         >
           Log In
         </Button>
+        <div className='flex flex-row justify-between' >
+         <Link to="/forgetpassword" className='text-sm mt-4 text-blue-600' >
+              Forgot Password?
+            </Link>
+            <Link to="/signup" className='text-sm mt-4 text-blue-600' >
+              create account
+            </Link>  
+
+        </div>
       </Box>
     </Container>
   );
