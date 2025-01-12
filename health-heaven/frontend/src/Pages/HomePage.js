@@ -266,7 +266,7 @@ const HomePage = () => {
                 variant="contained"
                 color="primary"
                 component={Link}
-                to="/records"
+                to="/predictions"
                 fullWidth
                 style={{
                   marginTop: '10px',

@@ -11,6 +11,7 @@ const reminderRoutes = require('./routes/reminderRoutes');
 const cronJob = require('../Backend/Controller/Service/cron'); // Import the cron job
 const medicalRecordRoutes = require('../Backend/routes/medicalRecordRoutes'); // Import the new medical record routes
 const errorHandler = require('../Backend/middlewares/uploadMiddleware');
+const predictionRoutes = require("./routes/predictionRoutes");
 const connectDB = require('../Backend/DB'); // DB connection
 
 const app = express();
@@ -27,7 +28,7 @@ app.use('/api/doctors', doctorRoutes);
 app.use('/api', reminderRoutes); // Use reminder routes
 app.use('/api/medical-records', medicalRecordRoutes);
 app.use(errorHandler); // Apply after all other routes and middlewares
-
+app.use("/api", predictionRoutes);
 
 // Log environment variables for debugging
 console.log(`MONGO_URI: ${process.env.MONGO_URI}`);
