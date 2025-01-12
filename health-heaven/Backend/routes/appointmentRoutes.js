@@ -33,7 +33,7 @@ router.get('/', async (req, res) => {
 
 // Route to add a new appointment
 router.post('/', async (req, res) => {
-  const { doctorName, doctorImage, email, date, time, notes } = req.body;  // doctorImage is URL here
+  const { doctorName, doctorImage, email, date, time, notes } = req.body; // doctorImage is URL here
   console.log('Received data:', req.body);
 
   try {
@@ -52,7 +52,7 @@ router.post('/', async (req, res) => {
     console.log('Creating new appointment...');
     const newAppointment = new Appointment({
       doctorName,
-      doctorImage,  // Save the doctorImage URL to the appointment
+      doctorImage,
       email,
       date,
       time,
@@ -120,10 +120,29 @@ router.put('/:id/cancel', async (req, res) => {
     appointment.status = 'Cancelled';
     const updatedAppointment = await appointment.save();
     console.log('Appointment cancelled:', updatedAppointment);
-    res.json(updatedAppointment);
+    res.json({ message: 'Appointment cancelled successfully', appointment: updatedAppointment });
   } catch (error) {
     console.error('Error cancelling appointment:', error.message);
     res.status(500).json({ message: 'Error cancelling appointment', error: error.message });
+  }
+});
+
+// Route to delete an appointment
+router.delete('/:id', async (req, res) => {
+  try {
+    console.log('Deleting appointment:', req.params.id);
+    const appointment = await Appointment.findByIdAndDelete(req.params.id);
+
+    if (!appointment) {
+      console.log('Appointment not found.');
+      return res.status(404).json({ message: 'Appointment not found' });
+    }
+
+    console.log('Appointment deleted:', appointment);
+    res.json({ message: 'Appointment deleted successfully', appointment });
+  } catch (error) {
+    console.error('Error deleting appointment:', error.message);
+    res.status(500).json({ message: 'Error deleting appointment', error: error.message });
   }
 });
 

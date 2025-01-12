@@ -1,33 +1,41 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
-import HomeIcon from '@mui/icons-material/Home';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import FolderIcon from '@mui/icons-material/Folder';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import SchoolIcon from '@mui/icons-material/School';
-import ContactMailIcon from '@mui/icons-material/ContactMail';
-import InfoIcon from '@mui/icons-material/Info';
-import LoginIcon from '@mui/icons-material/Login';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import DashboardIcon from '@mui/icons-material/Dashboard'; // Import Dashboard Icon
+import React from "react";
+import { Link } from "react-router-dom";
+import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
+import HomeIcon from "@mui/icons-material/Home";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import FolderIcon from "@mui/icons-material/Folder";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import SchoolIcon from "@mui/icons-material/School";
+import ContactMailIcon from "@mui/icons-material/ContactMail";
+import InfoIcon from "@mui/icons-material/Info";
+import LoginIcon from "@mui/icons-material/Login";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import DashboardIcon from "@mui/icons-material/Dashboard"; // Import Dashboard Icon
 
 const Header = () => {
-  const iconStyle = { fontSize: '18px', marginRight: '8px' }; // Adjust icon size
+  const iconStyle = { fontSize: "18px", marginRight: "8px" }; // Adjust icon size
 
   return (
     <Box>
       {/* First Header (Green Gradient Background for Health) */}
-      <AppBar 
-        position="static" 
-        style={{ background: 'linear-gradient(45deg, #66bb6a, #4CAF50)' }}
+      <AppBar
+        position="static"
+        style={{
+          background:
+            "linear-gradient(135deg, #66bb6a 0%, #43a047 50%, #2e7d32 100%)",
+        }}
       >
         <Toolbar>
-          <Typography 
-            variant="h5" 
-            style={{ flexGrow: 1, fontFamily: 'Roboto, sans-serif', fontWeight: 'bold', letterSpacing: '1px' }}
+          <Typography
+            variant="h5"
+            style={{
+              flexGrow: 1,
+              fontFamily: "Roboto, sans-serif",
+              fontWeight: "bold",
+              letterSpacing: "1px",
+            }}
           >
-            Health Heaven
+            Healthify Solutions
           </Typography>
           <Button color="inherit" component={Link} to="/">
             <HomeIcon style={iconStyle} /> Home
@@ -41,7 +49,9 @@ const Header = () => {
           <Button color="inherit" component={Link} to="/doctor">
             <BarChartIcon style={iconStyle} /> Doctor
           </Button>
-          <Button color="inherit" component={Link} to="/dashboard"> {/* Add Dashboard link */}
+          <Button color="inherit" component={Link} to="/dashboard">
+            {" "}
+            {/* Add Dashboard link */}
             <DashboardIcon style={iconStyle} /> Dashboard
           </Button>
           <Button color="inherit" component={Link} to="/education">
@@ -51,14 +61,20 @@ const Header = () => {
       </AppBar>
 
       {/* Second Header (Flat Background Color, Reduced Height) */}
-      <AppBar 
-        position="static" 
-        style={{ backgroundColor: '#1976d2', height: '40px' }} // Flat background color and reduced height
+      <AppBar
+        position="static"
+        style={{ backgroundColor: "#1976d2", height: "40px" }} // Flat background color and reduced height
       >
-        <Toolbar style={{ minHeight: '40px' }}> {/* Reduce toolbar height */}
-          <Typography 
-            variant="body2" 
-            style={{ flexGrow: 1, fontFamily: 'Arial, sans-serif', color: '#fff' }}
+        <Toolbar style={{ minHeight: "40px" }}>
+          {" "}
+          {/* Reduce toolbar height */}
+          <Typography
+            variant="body2"
+            style={{
+              flexGrow: 1,
+              fontFamily: "Arial, sans-serif",
+              color: "#fff",
+            }}
           >
             Contact us: (555) 555-5555 | Email: info@healthheaven.com
           </Typography>

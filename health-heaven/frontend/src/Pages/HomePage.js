@@ -28,223 +28,262 @@ const HomePage = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
-    <Container maxWidth="lg" style={{ padding: '0' }}>
+    <>
       {/* Hero Section */}
-      <Grid
-        container
+      <section
+  style={{
+    position: "relative",
+    overflow: "hidden",
+    background: "linear-gradient(135deg, hsl(200 85% 45%), hsl(170 80% 45%))", 
+    padding: "8rem 0",
+    height: "auto",
+    width: "100%",
+    color: "#ffffff",
+  }}
+>
+  {/* Background Image Overlay */}
+  <div
+    style={{
+      position: "absolute",
+      inset: "0",
+      backgroundImage:
+        "url('https://images.unsplash.com/photo-1631815589968-fdb09a223b1e?auto=format&fit=crop&q=80&w=2940')",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      opacity: "0.2", // Increased opacity for a darker background
+    }}
+  ></div>
+
+  {/* Content Section */}
+  <div
+    style={{
+      position: "relative",
+      zIndex: "10",
+      maxWidth: "1140px",
+      margin: "0 auto",
+      padding: "0 1rem",
+    }}
+  >
+    <div
+      style={{
+        margin: "0 auto",
+        maxWidth: "48rem",
+        textAlign: "center",
+      }}
+    >
+      {/* Main Heading */}
+      <h1
         style={{
-          position: 'relative',
-          height: '60vh',
-          backgroundColor: '#1976d2', // Solid color for background
-          color: '#fff',
-          textAlign: 'center',
-          padding: '40px 20px',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginTop: '5px', // Space between header and hero section
+          marginBottom: "1.5rem",
+          fontSize: "4rem", // Increased font size for a bigger impact
+          fontWeight: "800", // Bold and strong text for the headline
+          lineHeight: "1.4",
+          color: "inherit",
         }}
       >
-        <Grid item xs={12} style={{ position: 'relative', zIndex: 1 }}>
-          <Typography
-            variant="h2"
-            component="h1"
-            style={{
-              fontWeight: 'bold',
-              marginBottom: '20px',
-            }}
-          >
-            Welcome to Health Heaven
-          </Typography>
-          <Typography
-            variant="h6"
-            paragraph
-            style={{
-              marginBottom: '30px',
-              maxWidth: '800px',
-              margin: '0 auto',
-            }}
-          >
-            Managing health care appointments, medication schedules, and medical
-            records can be challenging. Health Heaven simplifies health
-            management by providing a centralized platform to schedule
-            appointments, receive medication reminders, and track medical
-            records. This improves adherence to treatment plans and enhances
-            communication with healthcare providers for better health outcomes.
-          </Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            component={Link}
-            to="/appointments"
-            style={{
-              maxWidth: '200px',
-              backgroundColor: '#fff', // Contrast with the hero background
-              color: '#2196f3', // Blue text for the button
-              textTransform: 'uppercase',
-            }}
-          >
-            Get Started
-          </Button>
-        </Grid>
-      </Grid>
+        Welcome to Healthify Solutions
+      </h1>
+
+      {/* Subheading or Short Description */}
+      <p
+        style={{
+          marginBottom: "2.5rem", // Added space between sections
+          fontSize: "1.5rem", // Increased font size for better readability
+          color: "rgba(255, 255, 255, 0.85)", // Slightly less opaque text
+        }}
+      >
+Managing health care has never been easier. Schedule appointments, receive medication reminders, and track medical records all in one place.
+      </p>
+
+      {/* Additional Information */}
+      <div
+        style={{
+          marginBottom: "2rem",
+          fontSize: "1.25rem", // Increased font size for the features section
+          color: "rgba(255, 255, 255, 0.9)",
+          textAlign: "center",
+        }}
+      >
+        {/* <p>Our platform offers:</p>
+        <ul style={{ listStyle: "none", padding: "0", marginTop: "1rem" }}>
+          <li>🩺 Easy access to your healthcare schedule</li>
+          <li>💊 Automated medication reminders</li>
+          <li>📑 Secure storage for your medical records</li>
+        </ul> */}
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
 
       {/* Quick Access Section */}
       <Grid
-        container
-        spacing={4}
-        style={{ marginTop: '40px', justifyContent: 'center' }}
+  container
+  spacing={4}
+  style={{
+    margin: "40px auto",
+    maxWidth: "1200px", // Added maximum width for centering
+    padding: "0 20px", // Added padding for margins on both sides
+    justifyContent: "center",
+  }}
+>
+  <Grid item xs={12} sm={4}>
+    <Paper elevation={3} style={{ padding: "20px", textAlign: "center" }}>
+      <Typography variant="h5" gutterBottom>
+        Book an Appointment
+      </Typography>
+      <Typography variant="body2" paragraph>
+        Schedule your appointments with ease and never miss an important
+        check-up.
+      </Typography>
+      <Button
+        variant="contained"
+        color="primary"
+        component={Link}
+        to="/appointments"
+        style={{ backgroundColor: "#2196f3", color: "#fff" }} // Blue color
       >
-        <Grid item xs={12} sm={4}>
-          <Paper elevation={3} style={{ padding: '20px', textAlign: 'center' }}>
-            <Typography variant="h5" gutterBottom>
-              Book an Appointment
-            </Typography>
-            <Typography variant="body2" paragraph>
-              Schedule your appointments with ease and never miss an important
-              check-up.
-            </Typography>
-            <Button
-              variant="contained"
-              color="primary"
-              component={Link}
-              to="/appointments"
-              style={{ backgroundColor: '#2196f3', color: '#fff' }} // Blue color
-            >
-              Schedule Now
-            </Button>
-          </Paper>
-        </Grid>
+        Schedule Now
+      </Button>
+    </Paper>
+  </Grid>
 
-        <Grid item xs={12} sm={4}>
-          <Paper elevation={3} style={{ padding: '20px', textAlign: 'center' }}>
-            <Typography variant="h5" gutterBottom>
-              Set Medication Reminders
-            </Typography>
-            <Typography variant="body2" paragraph>
-              Never miss a dose with timely reminders for your medications.
-            </Typography>
-            <Button
-              variant="contained"
-              color="primary"
-              component={Link}
-              to="/reminders"
-              style={{ backgroundColor: '#2196f3', color: '#fff' }} // Blue color
-            >
-              Set Reminders
-            </Button>
-          </Paper>
-        </Grid>
-
-        <Grid item xs={12} sm={4}>
-          <Paper elevation={3} style={{ padding: '20px', textAlign: 'center' }}>
-            <Typography variant="h5" gutterBottom>
-              Track Medical Records
-            </Typography>
-            <Typography variant="body2" paragraph>
-              Securely manage and access your medical records whenever needed.
-            </Typography>
-            <Button
-              variant="contained"
-              color="primary"
-              component={Link}
-              to="/records"
-              style={{ backgroundColor: '#2196f3', color: '#fff' }} // Blue color
-            >
-              Manage Records
-            </Button>
-          </Paper>
-        </Grid>
-      </Grid>
-
-      {/* Features Section */}
-      <Grid
-        container
-        spacing={4}
-        style={{ marginTop: '40px', justifyContent: 'center' }}
+  <Grid item xs={12} sm={4}>
+    <Paper elevation={3} style={{ padding: "20px", textAlign: "center" }}>
+      <Typography variant="h5" gutterBottom>
+        Set Medication Reminders
+      </Typography>
+      <Typography variant="body2" paragraph>
+        Never miss a dose with timely reminders for your medications.
+      </Typography>
+      <Button
+        variant="contained"
+        color="primary"
+        component={Link}
+        to="/reminders"
+        style={{ backgroundColor: "#2196f3", color: "#fff" }} // Blue color
       >
-        <Grid item xs={12}>
-          <Typography
-            variant="h4"
-            component="h2"
-            style={{
-              marginBottom: '20px',
-              textAlign: 'center',
-              color: '#388e3c',
-            }}
-          >
-            Explore Our Features
-          </Typography>
-        </Grid>
+        Set Reminders
+      </Button>
+    </Paper>
+  </Grid>
 
-        {/* Feature Cards */}
-        <Grid item xs={12} sm={6} md={4}>
-          <Card style={{ height: '100%' }}>
-            <CardMedia
-              component="img"
-              height="140"
-              image={feature1}
-              alt="Appointment Scheduling"
-            />
-            <CardContent>
-              <Typography variant="h5" gutterBottom>
-                Appointment Scheduling
-              </Typography>
-              <Typography variant="body2" color="textSecondary">
-                Easily schedule and manage your medical appointments with
-                healthcare providers, ensuring you never miss an important
-                check-up.
-              </Typography>
-              <Button
-                variant="contained"
-                color="primary"
-                component={Link}
-                to="/appointments"
-                fullWidth
-                style={{
-                  marginTop: '10px',
-                  backgroundColor: '#2196f3',
-                  color: '#fff',
-                }} // Blue color
-              >
-                Schedule Now
-              </Button>
-            </CardContent>
-          </Card>
-        </Grid>
+  <Grid item xs={12} sm={4}>
+    <Paper elevation={3} style={{ padding: "20px", textAlign: "center" }}>
+      <Typography variant="h5" gutterBottom>
+        Track Medical Records
+      </Typography>
+      <Typography variant="body2" paragraph>
+        Securely manage and access your medical records whenever needed.
+      </Typography>
+      <Button
+        variant="contained"
+        color="primary"
+        component={Link}
+        to="/records"
+        style={{ backgroundColor: "#2196f3", color: "#fff" }} // Blue color
+      >
+        Manage Records
+      </Button>
+    </Paper>
+  </Grid>
+</Grid>
 
-        <Grid item xs={12} sm={6} md={4}>
-          <Card style={{ height: '100%' }}>
-            <CardMedia
-              component="img"
-              height="140"
-              image={feature2}
-              alt="Medication Reminders"
-            />
-            <CardContent>
-              <Typography variant="h5" gutterBottom>
-                Medication Reminders
-              </Typography>
-              <Typography variant="body2" color="textSecondary">
-                Set medication reminders to ensure you never miss a dose,
-                helping you stay on track with your treatment plan.
-              </Typography>
-              <Button
-                variant="contained"
-                color="primary"
-                component={Link}
-                to="/reminders"
-                fullWidth
-                style={{
-                  marginTop: '10px',
-                  backgroundColor: '#2196f3',
-                  color: '#fff',
-                }} // Blue color
-              >
-                Set Reminders
-              </Button>
-            </CardContent>
-          </Card>
-        </Grid>
+{/* Features Section */}
+<Grid
+  container
+  spacing={4}
+  style={{
+    margin: "60px auto", // Added vertical spacing
+    maxWidth: "1200px", // Maximum width for alignment
+    padding: "0 20px", // Side padding for margins
+    justifyContent: "center",
+  }}
+>
+  <Grid item xs={12}>
+    <Typography
+      variant="h4"
+      component="h2"
+      style={{
+        marginBottom: "20px",
+        textAlign: "center",
+        color: "#388e3c",
+      }}
+    >
+      Explore Our Features
+    </Typography>
+  </Grid>
+
+  {/* Feature Cards */}
+  <Grid item xs={12} sm={6} md={4}>
+    <Card style={{ height: "100%" }}>
+      <CardMedia
+        component="img"
+        height="140"
+        image={feature1}
+        alt="Appointment Scheduling"
+      />
+      <CardContent>
+        <Typography variant="h5" gutterBottom>
+          Appointment Scheduling
+        </Typography>
+        <Typography variant="body2" color="textSecondary">
+          Easily schedule and manage your medical appointments with healthcare
+          providers, ensuring you never miss an important check-up.
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          component={Link}
+          to="/appointments"
+          fullWidth
+          style={{
+            marginTop: "10px",
+            backgroundColor: "#2196f3",
+            color: "#fff",
+          }}
+        >
+          Schedule Now
+        </Button>
+      </CardContent>
+    </Card>
+  </Grid>
+
+  <Grid item xs={12} sm={6} md={4}>
+    <Card style={{ height: "100%" }}>
+      <CardMedia
+        component="img"
+        height="140"
+        image={feature2}
+        alt="Medication Reminders"
+      />
+      <CardContent>
+        <Typography variant="h5" gutterBottom>
+          Medication Reminders
+        </Typography>
+        <Typography variant="body2" color="textSecondary">
+          Set medication reminders to ensure you never miss a dose, helping you
+          stay on track with your treatment plan.
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          component={Link}
+          to="/reminders"
+          fullWidth
+          style={{
+            marginTop: "10px",
+            backgroundColor: "#2196f3",
+            color: "#fff",
+          }}
+        >
+          Set Reminders
+        </Button>
+      </CardContent>
+    </Card>
+  </Grid>
 
         <Grid item xs={12} sm={6} md={4}>
           <Card style={{ height: '100%' }}>
@@ -266,7 +305,7 @@ const HomePage = () => {
                 variant="contained"
                 color="primary"
                 component={Link}
-                to="/predictions"
+                to="/records"
                 fullWidth
                 style={{
                   marginTop: '10px',
@@ -427,7 +466,7 @@ const HomePage = () => {
           Join Now
         </Button>
       </Container>
-    </Container>
+    </>
   );
 };
 

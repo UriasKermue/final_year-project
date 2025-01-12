@@ -108,17 +108,27 @@ const AppointmentScheduler = () => {
 };
 
 
-  const handleDelete = async (appointmentId) => {
-    try {
-        console.log(`Attempting to delete appointment with ID: ${appointmentId}`);
-        await axios.delete(`http://localhost:5000/api/appointments/${appointmentId}`);
-        setAppointments(appointments.filter((appointment) => appointment._id !== appointmentId));
-        setSuccess('Appointment deleted successfully!');
-    } catch (err) {
-        console.error('Error deleting appointment:', err.response || err);
-        setError('Failed to delete appointment. Please try again.');
-    }
+const handleDelete = async (appointmentId) => {
+  try {
+      console.log(`Attempting to delete appointment with ID: ${appointmentId}`);
+      const response = await axios.delete(`http://localhost:5000/api/appointments/${appointmentId}`);
+      setAppointments((prevAppointments) =>
+          prevAppointments.filter((appointment) => appointment._id !== appointmentId)
+      );
+      setSuccess('Appointment deleted successfully!');
+  } catch (err) {
+      // Log the full error for better debugging
+      if (err.response) {
+          console.error('Error response from server:', err.response.data);
+          console.error('Error status:', err.response.status);
+          console.error('Error headers:', err.response.headers);
+      } else {
+          console.error('Error deleting appointment:', err.message || err);
+      }
+      setError('Failed to delete appointment. Please try again.');
+  }
 };
+
 
 
   const handleEdit = (appointment) => {
