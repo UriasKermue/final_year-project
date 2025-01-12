@@ -14,6 +14,7 @@ import SupportPage from './Pages/SupportPage';
 import LoginPage from './Pages/LoginPage';
 import SignupPage from './Pages/SignupPage';
 import DoctorList from './Pages/DoctorList';
+import DiseasePrediction from './Pages/DiseasePrediction';
 
 const App = () => {
   return (
@@ -32,6 +33,7 @@ const App = () => {
           <Route path="/support" element={<SupportPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/predictions" element={<DiseasePrediction />} />
         </Routes>
       </main>
       <Footer />
