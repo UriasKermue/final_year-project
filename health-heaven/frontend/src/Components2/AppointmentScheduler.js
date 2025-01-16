@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, TextField, Button, Grid, Box, Alert, Modal, CircularProgress } from '@mui/material';
 import axios from 'axios';
-import Avatar from '@mui/material/Avatar';
-
+import { Calendar, Clock, Mail, Pencil, X, Loader2, FileText, User, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 const AppointmentScheduler = () => {
   const [appointmentData, setAppointmentData] = useState({
@@ -13,42 +11,22 @@ const AppointmentScheduler = () => {
     notes: '',
   });
   const [appointments, setAppointments] = useState([]);
-  const [doctors, setDoctors] = useState([]); // List of doctors
-  const [loading, setLoading] = useState(false); // Loader state
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [editingAppointment, setEditingAppointment] = useState(null);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [formErrors, setFormErrors] = useState({});
 
-  const modalStyle = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-  };
-
   useEffect(() => {
-    // Fetch doctors and appointments when the component mounts
     axios.get('http://localhost:5000/api/doctors')
-      .then(response => {
-        setDoctors(response.data); // Set the list of doctors
-      })
-      .catch(err => {
-        console.error("Error fetching doctors:", err);
-      });
+      .then(response => setDoctors(response.data))
+      .catch(err => console.error("Error fetching doctors:", err));
 
     axios.get('http://localhost:5000/api/appointments')
-      .then(response => {
-        setAppointments(response.data);
-      })
-      .catch(err => {
-        console.error("Error fetching appointments:", err);
-      });
+      .then(response => setAppointments(response.data))
+      .catch(err => console.error("Error fetching appointments:", err));
   }, []);
 
   const handleChange = (e) => {
@@ -83,10 +61,9 @@ const AppointmentScheduler = () => {
     setLoading(true);
 
     try {
-      // Ensure that you pass the doctor's image URL in appointmentData
       const doctor = doctors.find(d => d.name === appointmentData.doctorName);
       if (doctor) {
-        appointmentData.doctorImage = doctor.imageURL; // Assuming imageURL is the key for the doctor's image
+        appointmentData.doctorImage = doctor.imageURL;
       }
 
       const response = await axios.post('http://localhost:5000/api/appointments', appointmentData);
@@ -105,31 +82,19 @@ const AppointmentScheduler = () => {
     } finally {
       setLoading(false);
     }
-};
+  };
 
-
-const handleDelete = async (appointmentId) => {
-  try {
-      console.log(`Attempting to delete appointment with ID: ${appointmentId}`);
-      const response = await axios.delete(`http://localhost:5000/api/appointments/${appointmentId}`);
+  const handleDelete = async (appointmentId) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/appointments/${appointmentId}`);
       setAppointments((prevAppointments) =>
-          prevAppointments.filter((appointment) => appointment._id !== appointmentId)
+        prevAppointments.filter((appointment) => appointment._id !== appointmentId)
       );
-      setSuccess('Appointment deleted successfully!');
-  } catch (err) {
-      // Log the full error for better debugging
-      if (err.response) {
-          console.error('Error response from server:', err.response.data);
-          console.error('Error status:', err.response.status);
-          console.error('Error headers:', err.response.headers);
-      } else {
-          console.error('Error deleting appointment:', err.message || err);
-      }
-      setError('Failed to delete appointment. Please try again.');
-  }
-};
-
-
+      setSuccess('Appointment cancelled successfully!');
+    } catch (err) {
+      setError('Failed to cancel appointment. Please try again.');
+    }
+  };
 
   const handleEdit = (appointment) => {
     setEditingAppointment(appointment);
@@ -156,10 +121,9 @@ const handleDelete = async (appointmentId) => {
 
     try {
       const response = await axios.put(`http://localhost:5000/api/appointments/${editingAppointment._id}`, appointmentData);
-      const updatedAppointments = appointments.map((appt) => 
+      setAppointments(appointments.map((appt) => 
         appt._id === editingAppointment._id ? response.data : appt
-      );
-      setAppointments(updatedAppointments);
+      ));
       setSuccess('Appointment updated successfully!');
       setOpenEditModal(false);
       setAppointmentData({
@@ -178,271 +142,262 @@ const handleDelete = async (appointmentId) => {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 3 }}>
-      <Typography variant="h4" component="h1" gutterBottom align="center" sx={{ mb: 2 }}>
-        Schedule an Appointment
-      </Typography>
-      <Typography variant="body1" paragraph align="center">
-        Use the form below to schedule, reschedule, or cancel your medical appointments.
-      </Typography>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-12">
+          <h1 className="text-3xl font-bold text-gray-900">Schedule an Appointment</h1>
+          <p className="mt-2 text-gray-600">Book, modify, or cancel your medical appointments</p>
+        </div>
 
-      {error && <Alert severity="error">{error}</Alert>}
-      {success && <Alert severity="success">{success}</Alert>}
+        {error && (
+          <div className="mb-6 flex items-center gap-2 p-4 bg-red-50 text-red-700 rounded-lg">
+            <AlertCircle className="h-5 w-5" />
+            <p>{error}</p>
+          </div>
+        )}
 
-      <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3 }}>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              id="doctorName"
-              name="doctorName"
-              label="Doctor Name"
-              value={appointmentData.doctorName}
-              onChange={handleChange}
-              required
-              variant="outlined"
-              error={Boolean(formErrors.doctorName)}
-              helperText={formErrors.doctorName}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              id="email"
-              name="email"
-              label="Email Address"
-              value={appointmentData.email}
-              onChange={handleChange}
-              required
-              variant="outlined"
-              type="email"
-              error={Boolean(formErrors.email)}
-              helperText={formErrors.email}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              id="date"
-              name="date"
-              label="Appointment Date"
-              type="date"
-              value={appointmentData.date}
-              onChange={handleChange}
-              InputLabelProps={{ shrink: true }}
-              required
-              variant="outlined"
-              error={Boolean(formErrors.date)}
-              helperText={formErrors.date}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              id="time"
-              name="time"
-              label="Appointment Time"
-              type="time"
-              value={appointmentData.time}
-              onChange={handleChange}
-              InputLabelProps={{ shrink: true }}
-              required
-              variant="outlined"
-              error={Boolean(formErrors.time)}
-              helperText={formErrors.time}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              id="notes"
-              name="notes"
-              label="Additional Notes"
-              value={appointmentData.notes}
-              onChange={handleChange}
-              variant="outlined"
-              multiline
-              rows={4}
-            />
-          </Grid>
-        </Grid>
+        {success && (
+          <div className="mb-6 flex items-center gap-2 p-4 bg-green-50 text-green-700 rounded-lg">
+            <CheckCircle2 className="h-5 w-5" />
+            <p>{success}</p>
+          </div>
+        )}
 
-        <Button type="submit" fullWidth variant="contained" color="primary" sx={{ mt: 2 }}>
-          {loading ? "Scheduling..." : "Schedule Appointment"}
-        </Button>
-      </Box>
-
-      <Typography variant="h5" component="h2" gutterBottom sx={{ mt: 4, fontWeight: 'bold', color: 'primary.main' }}>
-  Your Appointments
-</Typography>
-
-{loading ? (
-  <Box display="flex" justifyContent="center" alignItems="center" sx={{ mt: 3 }}>
-    <CircularProgress />
-  </Box>
-) : (
-  <Box sx={{ mt: 2 }}>
-    
-    {appointments.length === 0 ? (
-      <Typography variant="body1" sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
-        No appointments scheduled.
-      </Typography>
-    ) : (
-      <ul style={{ listStyleType: 'none', paddingLeft: 0 }}>
-        {appointments.map((appointment) => {
-          const date = new Date(appointment.date);
-          const formattedDate = date.toLocaleDateString('en-US');  // Date in MM/DD/YYYY format
-          const formattedTime = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });  // Time in 12-hour format with AM/PM
-
-          return (
-            <li
-              key={appointment._id}
-              style={{
-                marginBottom: '20px',
-                padding: '10px',
-                backgroundColor: '#f9f9f9',
-                borderRadius: '8px',
-                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-              }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                {/* Doctor Image */}
-                <Avatar
-                  alt={appointment.doctorName}
-                  src={appointment.doctorImage} // Fallback to specified image
-                  sx={{ width: 60, height: 60 }}
-                />
-
-                <Typography variant="body1" sx={{ fontWeight: '500', color: 'text.primary' }}>
-                  <strong>{appointment.doctorName}</strong>
-                  <br />
-                  <span sx={{ fontSize: '0.9rem', color: 'text.secondary' }}>
-                    {formattedDate} at {formattedTime}
-                  </span>
-                  <br />
-                  <em sx={{ fontSize: '0.9rem', color: 'text.secondary' }}>{appointment.notes}</em>
-                </Typography>
-              </Box>
-
-              <Box sx={{ display: 'flex', gap: 2, marginTop: 1 }}>
-                <Button
-                  variant="outlined"
-                  color="error"
-                  onClick={() => handleDelete(appointment._id)}
-                  sx={{ textTransform: 'none' }}
-                >
-                  Cancel
-                </Button>
-
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  onClick={() => handleEdit(appointment)}
-                  sx={{ textTransform: 'none' }}
-                >
-                  Edit
-                </Button>
-              </Box>
-            </li>
-          );
-        })}
-      </ul>
-    )}
-  </Box>
-)}
-
-
-      {/* Edit Modal */}
-      <Modal open={openEditModal} onClose={() => setOpenEditModal(false)}>
-        <Box sx={modalStyle}>
-          <Typography variant="h6" component="h2" gutterBottom>
-            Edit Appointment
-          </Typography>
-          <Box component="form" onSubmit={handleEditSubmit}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  id="doctorName"
+        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-md p-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Doctor Name</label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <input
+                  type="text"
                   name="doctorName"
-                  label="Doctor Name"
                   value={appointmentData.doctorName}
                   onChange={handleChange}
-                  required
-                  variant="outlined"
-                  error={Boolean(formErrors.doctorName)}
-                  helperText={formErrors.doctorName}
+                  className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
+                    formErrors.doctorName ? 'border-red-500' : 'border-gray-300'
+                  } focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
+                  placeholder="Enter doctor's name"
                 />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  id="email"
+              </div>
+              {formErrors.doctorName && (
+                <p className="mt-1 text-sm text-red-600">{formErrors.doctorName}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <input
+                  type="email"
                   name="email"
-                  label="Email Address"
                   value={appointmentData.email}
                   onChange={handleChange}
-                  required
-                  variant="outlined"
-                  type="email"
-                  error={Boolean(formErrors.email)}
-                  helperText={formErrors.email}
+                  className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
+                    formErrors.email ? 'border-red-500' : 'border-gray-300'
+                  } focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
+                  placeholder="Enter your email"
                 />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  id="date"
-                  name="date"
-                  label="Appointment Date"
+              </div>
+              {formErrors.email && (
+                <p className="mt-1 text-sm text-red-600">{formErrors.email}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <input
                   type="date"
+                  name="date"
                   value={appointmentData.date}
                   onChange={handleChange}
-                  InputLabelProps={{ shrink: true }}
-                  required
-                  variant="outlined"
-                  error={Boolean(formErrors.date)}
-                  helperText={formErrors.date}
+                  className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
+                    formErrors.date ? 'border-red-500' : 'border-gray-300'
+                  } focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
                 />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  id="time"
-                  name="time"
-                  label="Appointment Time"
+              </div>
+              {formErrors.date && (
+                <p className="mt-1 text-sm text-red-600">{formErrors.date}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Time</label>
+              <div className="relative">
+                <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <input
                   type="time"
+                  name="time"
                   value={appointmentData.time}
                   onChange={handleChange}
-                  InputLabelProps={{ shrink: true }}
-                  required
-                  variant="outlined"
-                  error={Boolean(formErrors.time)}
-                  helperText={formErrors.time}
+                  className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
+                    formErrors.time ? 'border-red-500' : 'border-gray-300'
+                  } focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
                 />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  id="notes"
+              </div>
+              {formErrors.time && (
+                <p className="mt-1 text-sm text-red-600">{formErrors.time}</p>
+              )}
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Additional Notes</label>
+              <div className="relative">
+                <FileText className="absolute left-3 top-3 text-gray-400 h-5 w-5" />
+                <textarea
                   name="notes"
-                  label="Additional Notes"
                   value={appointmentData.notes}
                   onChange={handleChange}
-                  variant="outlined"
-                  multiline
                   rows={4}
+                  className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  placeholder="Any special requirements or conditions..."
                 />
-              </Grid>
-            </Grid>
+              </div>
+            </div>
+          </div>
 
-            <Button type="submit" fullWidth variant="contained" color="primary" sx={{ mt: 2 }}>
-              {loading ? "Updating..." : "Update Appointment"}
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
-    </Container>
+          <button
+            type="submit"
+            disabled={loading}
+            className="mt-6 w-full flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="animate-spin h-5 w-5" />
+                Scheduling...
+              </>
+            ) : (
+              <>
+                <Calendar className="h-5 w-5" />
+                Schedule Appointment
+              </>
+            )}
+          </button>
+        </form>
+
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-6">Your Appointments</h2>
+          
+          {loading ? (
+            <div className="flex justify-center items-center py-12">
+              <Loader2 className="animate-spin h-8 w-8 text-indigo-600" />
+            </div>
+          ) : appointments.length === 0 ? (
+            <p className="text-center text-gray-500 py-8">No appointments scheduled.</p>
+          ) : (
+            <div className="space-y-4">
+              {appointments.map((appointment) => {
+                const date = new Date(appointment.date);
+                const formattedDate = date.toLocaleDateString('en-US');
+                const formattedTime = appointment.time;
+
+                return (
+                  <div
+                    key={appointment._id}
+                    className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                  >
+                    <img
+                      src={appointment.doctorImage || 'https://via.placeholder.com/60x60'}
+                      alt={appointment.doctorName}
+                      className="w-16 h-16 rounded-full object-cover"
+                    />
+                    
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900">{appointment.doctorName}</h3>
+                      <div className="mt-1 space-y-1 text-sm text-gray-600">
+                        <p className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4" />
+                          {formattedDate}
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <Clock className="h-4 w-4" />
+                          {formattedTime}
+                        </p>
+                        {appointment.notes && (
+                          <p className="flex items-center gap-2">
+                            <FileText className="h-4 w-4" />
+                            {appointment.notes}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleEdit(appointment)}
+                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      >
+                        <Pencil className="h-5 w-5" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(appointment._id)}
+                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      >
+                        <X className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Edit Modal */}
+        {openEditModal && (
+          <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-2xl mx-4">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-semibold text-gray-900">Edit Appointment</h2>
+                <button
+                  onClick={() => setOpenEditModal(false)}
+                  className="p-2 text-gray-400 hover:text-gray-500 rounded-lg transition-colors"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+
+              <form onSubmit={handleEditSubmit} className="space-y-6">
+                {/* Same form fields as the main form */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* ... Copy the form fields from above ... */}
+                </div>
+
+                <div className="flex justify-end gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setOpenEditModal(false)}
+                    className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="animate-spin h-5 w-5" />
+                        Updating...
+                      </>
+                    ) : (
+                      <>
+                        <Pencil className="h-5 w-5" />
+                        Update Appointment
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 

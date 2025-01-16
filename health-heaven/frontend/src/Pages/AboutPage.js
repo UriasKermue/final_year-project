@@ -1,5 +1,4 @@
 import React from 'react';
-import { Container, Typography, Grid, Card, CardContent, CardMedia, Paper } from '@mui/material';
 
 // Importing images
 import uriasImage from '../assets/images/Urias Kermue.jpg';
@@ -39,101 +38,58 @@ const teamMembers = [
 
 const About = () => {
   return (
-    <Container maxWidth="lg" sx={{ mt: 5, mb: 5 }}>
-      <Typography
-        variant="h3"
-        component="h1"
-        align="center"
-        sx={{ mb: 4, fontWeight: 'bold', color: 'primary.main' }}
-      >
-        About Us
-      </Typography>
-      <Grid container spacing={4} sx={{ mb: 4 }}>
-        <Grid item xs={12}>
-          <Paper elevation={3} sx={{ p: 3 }}>
-            <Typography
-              variant="h5"
-              component="h2"
-              align="center"
-              sx={{ mb: 2, fontWeight: 'bold', color: 'text.primary' }}
-            >
-              Our Mission
-            </Typography>
-            <Typography
-              variant="body1"
-              paragraph
-              align="center"
-              sx={{ color: 'text.secondary' }}
-            >
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted py-16">
+      <div className="container mx-auto px-4">
+        {/* Header Section */}
+        <div className="text-center mb-16">
+          <h1 className="text-4xl font-bold tracking-tight text-primary mb-4">About Health Heaven</h1>
+          <div className="w-24 h-1 bg-primary mx-auto mb-8 rounded-full" />
+        </div>
+
+        {/* Mission Section */}
+        <div className="max-w-3xl mx-auto mb-20">
+          <div className="bg-card/50 backdrop-blur-sm border-muted p-8 rounded-lg shadow-md">
+            <div className="flex items-center justify-center mb-4">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <svg className="w-6 h-6 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2L12 22"></path>
+                  <path d="M5 12l7 7 7-7"></path>
+                </svg>
+              </div>
+            </div>
+            <h2 className="text-2xl font-semibold text-center mb-4">Our Mission</h2>
+            <p className="text-center text-muted-foreground leading-relaxed">
               At Health Heaven, our mission is to provide the best resources and
               support for your wellness journey. We are committed to delivering
               high-quality information and tools to help you achieve your health
               goals.
-            </Typography>
-          </Paper>
-        </Grid>
-        <Grid item xs={12}>
-          <Paper elevation={3} sx={{ p: 3 }}>
-            <Typography
-              variant="h5"
-              component="h2"
-              align="center"
-              sx={{ mb: 2, fontWeight: 'bold', color: 'text.primary' }}
-            >
-              Meet the Team
-            </Typography>
-            <Grid container spacing={2} justifyContent="center">
-              {teamMembers.map((member) => (
-                <Grid item xs={12} sm={4} md={2} key={member.name}>
-                  <Card
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      textAlign: 'center',
-                      height: '100%', // Ensures all cards have the same height
-                      borderRadius: 2, // Adds some smooth border-radius for better design
-                    }}
-                  >
-                    <CardMedia
-                      component="img"
-                      image={member.image}
-                      alt={member.name}
-                      sx={{
-                        width: '100%',
-                        height: 180,
-                        objectFit: 'cover',
-                        borderRadius: '8px 8px 0 0', // Rounded top corners
-                      }}
-                    />
-                    <CardContent
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        p: 2,
-                      }}
-                    >
-                      <Typography
-                        variant="h6"
-                        sx={{ mb: 1, fontWeight: 'bold', color: 'text.primary' }}
-                      >
-                        {member.name}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Department: {member.department}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          </Paper>
-        </Grid>
-      </Grid>
-    </Container>
+            </p>
+          </div>
+        </div>
+
+        {/* Team Section */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-center mb-12">Meet the Team</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            {teamMembers.map((member) => (
+              <div key={member.name} className="group hover:shadow-2xl transition-all duration-300 overflow-hidden">
+                <div className="aspect-square overflow-hidden">
+                  <img
+                    src={member.image}
+                    alt={member.name}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
+                <div className="p-4 text-center">
+                  <h3 className="font-semibold text-lg mb-1">{member.name}</h3>
+                  <p className="text-sm text-muted-foreground">Department: {member.department}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

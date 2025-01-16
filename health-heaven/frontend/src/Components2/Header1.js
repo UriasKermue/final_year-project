@@ -37,7 +37,7 @@ const Header = () => {
           >
             Healthify Solutions
           </Typography>
-          <Button color="inherit" component={Link} to="/">
+          <Button color="inherit" component={Link} to="/homepage">
             <HomeIcon style={iconStyle} /> Home
           </Button>
           <Button color="inherit" component={Link} to="/appointments">
@@ -49,7 +49,7 @@ const Header = () => {
           <Button color="inherit" component={Link} to="/doctor">
             <BarChartIcon style={iconStyle} /> Doctor
           </Button>
-          <Button color="inherit" component={Link} to="/dashboard">
+          <Button color="inherit" component={Link} to="/dashboard1">
             {" "}
             {/* Add Dashboard link */}
             <DashboardIcon style={iconStyle} /> Dashboard

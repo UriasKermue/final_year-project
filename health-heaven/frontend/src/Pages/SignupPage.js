@@ -1,7 +1,20 @@
 import React, { useState } from 'react';
-import { Container, Typography, TextField, Button, Box, Grid, Divider } from '@mui/material';
-import FavoriteIcon from '@mui/icons-material/Favorite'; // Material-UI Heartbeat icon
-import { Link } from 'react-router-dom';
+import {
+  Container,
+  Typography,
+  TextField,
+  Button,
+  Box,
+  Grid,
+  IconButton,
+  InputAdornment,
+} from '@mui/material';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
@@ -13,18 +26,37 @@ const SignupPage = () => {
     address: '',
     allergies: '',
     chronicConditions: '',
-    pastSurgeries: '',
+    profileImage: null,
+    password: '',
+    confirmPassword: '',
   });
+
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleFileChange = (e) => {
+    setFormData({ ...formData, profileImage: e.target.files[0] });
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Form Data:', formData);
-    // Add form submission logic here
+
+    if (formData.password !== formData.confirmPassword) {
+      toast.error('Passwords do not match!');
+      return;
+    }
+
+    toast.success('Registration successful!');
+    navigate('/login');
   };
 
   return (
@@ -156,44 +188,81 @@ const SignupPage = () => {
               name="allergies"
             />
           </Grid>
-      
           <Grid item xs={12} md={6}>
             <TextField
-              label="Past Surgeries"
+              label="Chronic Conditions"
               variant="outlined"
               margin="normal"
               fullWidth
-              value={formData.pastSurgeries}
+              value={formData.chronicConditions}
               onChange={handleChange}
-              name="pastSurgeries"
+              name="chronicConditions"
             />
+          </Grid>
+
+          {/* Password Fields */}
+          <Grid item xs={12}>
+            <TextField
+              label="Password"
+              variant="outlined"
+              margin="normal"
+              fullWidth
+              type={showPassword ? 'text' : 'password'}
+              value={formData.password}
+              onChange={handleChange}
+              name="password"
+              required
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={togglePasswordVisibility}>
+                      {showPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="Confirm Password"
+              variant="outlined"
+              margin="normal"
+              fullWidth
+              type={showPassword ? 'text' : 'password'}
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              name="confirmPassword"
+              required
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={togglePasswordVisibility}>
+                      {showPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="body1" gutterBottom>
+              Upload Profile Picture
+            </Typography>
+            <input type="file" accept="image/*" onChange={handleFileChange} />
           </Grid>
         </Grid>
 
         {/* Submit Button */}
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          sx={{ mt: 3 }}
-        >
+        <Button type="submit" variant="contained" color="primary" sx={{ mt: 3 }}>
           Sign Up
         </Button>
 
-        {/* Already have an account and Forgot Password links */}
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            mt: 2,
-          }}
-        >
-          <Link to="/login"
-            className='text-sm text-blue-600  text-align-center'
-          >
-            Already have an account? 
+        {/* Already have an account link */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+          <Link to="/login" className="text-sm text-blue-600 text-align-center">
+            Already have an account?
           </Link>
-         
         </Box>
       </Box>
     </Container>

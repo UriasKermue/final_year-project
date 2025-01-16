@@ -104,12 +104,7 @@ Managing health care has never been easier. Schedule appointments, receive medic
           textAlign: "center",
         }}
       >
-        {/* <p>Our platform offers:</p>
-        <ul style={{ listStyle: "none", padding: "0", marginTop: "1rem" }}>
-          <li>🩺 Easy access to your healthcare schedule</li>
-          <li>💊 Automated medication reminders</li>
-          <li>📑 Secure storage for your medical records</li>
-        </ul> */}
+       
       </div>
     </div>
   </div>
@@ -173,19 +168,19 @@ Managing health care has never been easier. Schedule appointments, receive medic
   <Grid item xs={12} sm={4}>
     <Paper elevation={3} style={{ padding: "20px", textAlign: "center" }}>
       <Typography variant="h5" gutterBottom>
-        Track Medical Records
+        Detect A Potential Disease
       </Typography>
       <Typography variant="body2" paragraph>
-        Securely manage and access your medical records whenever needed.
+        Our robust Machine Learning feature predicts a possible diesease that you may be unware of.
       </Typography>
       <Button
         variant="contained"
         color="primary"
         component={Link}
-        to="/records"
+        to="/predictions"
         style={{ backgroundColor: "#2196f3", color: "#fff" }} // Blue color
       >
-        Manage Records
+        Detect Now
       </Button>
     </Paper>
   </Grid>
@@ -298,8 +293,7 @@ Managing health care has never been easier. Schedule appointments, receive medic
                 Medical Records Tracking
               </Typography>
               <Typography variant="body2" color="textSecondary">
-                Securely store and manage your medical records in one place,
-                easily accessible whenever you need them.
+                Securely store and manage your medical records in one place.
               </Typography>
               <Button
                 variant="contained"

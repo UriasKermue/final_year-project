@@ -6,7 +6,7 @@ const sendEmail = require('../utils/sendEmail'); // Import the sendEmail functio
 
 const register = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { email, password } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -19,7 +19,6 @@ const register = async (req, res) => {
 
     // Create new user
     const newUser = new User({
-      username,
       email,
       password: hashedPassword,
     });
@@ -40,9 +39,9 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
-    const user = await User.findOne({ username });
+    const user = await User.findOne({email });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }

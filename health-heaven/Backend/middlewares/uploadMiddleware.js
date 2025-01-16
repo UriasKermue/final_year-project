@@ -27,5 +27,5 @@ const fileFilter = (req, file, cb) => {
 // Create the multer instance with the storage configuration and file filter
 const upload = multer({ storage, fileFilter });
 
-// Export the middleware for single file upload (you can change it to multiple if needed)
-module.exports = upload.single('file');
+// Export the middleware for single file upload with field name 'profileImage'
+module.exports = upload.single('profileImage');

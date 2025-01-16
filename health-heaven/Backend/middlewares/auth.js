@@ -1,6 +1,5 @@
-// middlewares/auth.js
 const jwt = require('jsonwebtoken');
-const User = require('../models/user');
+const Newuser = require('../models/Newuser');  // Updated import to 'newuser.js'
 
 const authenticate = async (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
@@ -11,7 +10,7 @@ const authenticate = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decoded.userId);
+    req.user = await Newuser.findById(decoded.userId);  // Updated to use Newuser model
     next();
   } catch (error) {
     res.status(401).json({ message: 'Invalid token' });

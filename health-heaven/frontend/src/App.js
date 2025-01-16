@@ -1,8 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify'; // Import ToastContainer and toast
+import 'react-toastify/dist/ReactToastify.css'; // Import CSS for Toastify
 import Header from './Components2/Header1';
 import Footer from './Components2/Footer';
-import Dashboard from './Pages/Dashboard';
+import Dashboard from '../src/Pages/Dboard/Dashboard1';
 import HomePage from './Pages/HomePage';
 import AppointmentScheduler from './Components2/AppointmentScheduler';
 import MedicationReminder from './Components2/MedicationReminder';
@@ -17,7 +19,6 @@ import DoctorList from './Pages/DoctorList';
 import DiseasePrediction from './Pages/DiseasePrediction';
 import Start from './Pages/Start';
 
-
 const App = () => {
   return (
     <Router>
@@ -29,11 +30,14 @@ const App = () => {
 const Main = () => {
   const location = useLocation();
 
-  // Check if the current route is the Start, Login, or Signup page
-  const isNoHeaderFooterPage = ['/','/login', '/signup', '/forgetpassword'].includes(location.pathname);
+  // Check if the current route should not display the Header and Footer
+  const isNoHeaderFooterPage = ['/', '/login', '/signup', '/forgetpassword', '/dashboard1'].includes(location.pathname);
 
   return (
     <>
+      {/* Toast Container */}
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+      
       {/* Conditionally render Header and Footer */}
       {!isNoHeaderFooterPage && <Header />}
       <main>
@@ -41,7 +45,7 @@ const Main = () => {
           <Route path="/" element={<Start />} />
           <Route path="/forgetpassword" element={<Forgetpassword />} />
           <Route path="/homepage" element={<HomePage />} />
-          <Route path="/dashboard/*" element={<Dashboard />} />
+          <Route path="/dashboard1" element={<Dashboard />} />
           <Route path="/appointments" element={<AppointmentScheduler />} />
           <Route path="/reminders" element={<MedicationReminder />} />
           <Route path="/records" element={<MedicalRecord />} />
@@ -54,7 +58,6 @@ const Main = () => {
           <Route path="/predictions" element={<DiseasePrediction />} />
         </Routes>
       </main>
-      {/* Conditionally render Footer */}
       {!isNoHeaderFooterPage && <Footer />}
     </>
   );
