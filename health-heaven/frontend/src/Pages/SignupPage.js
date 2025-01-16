@@ -47,16 +47,57 @@ const SignupPage = () => {
     setShowPassword((prev) => !prev);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match!');
-      return;
+  const validateForm = () => {
+    const { fullName, age, email, phone, password, confirmPassword } = formData;
+    if (!fullName || !age || !email || !phone || !password || !confirmPassword) {
+      toast.error('All required fields must be filled!');
+      return false;
     }
 
-    toast.success('Registration successful!');
-    navigate('/login');
+    if (isNaN(age) || age <= 0) {
+      toast.error('Age must be a valid number greater than 0!');
+      return false;
+    }
+
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      toast.error('Invalid email format!');
+      return false;
+    }
+
+    if (password !== confirmPassword) {
+      toast.error('Passwords do not match!');
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) return;
+
+    const formDataToSend = new FormData();
+    Object.keys(formData).forEach((key) => {
+      formDataToSend.append(key, formData[key]);
+    });
+
+    try {
+      const response = await fetch('http://localhost:5000/api/newusers/newuser', {
+        method: 'POST',
+        body: formDataToSend,
+      });
+
+      if (response.ok) {
+        toast.success('Registration successful!');
+        navigate('/login');
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.message || 'Something went wrong!');
+      }
+    } catch (error) {
+      toast.error('Error connecting to the server!');
+    }
   };
 
   return (
@@ -104,147 +145,61 @@ const SignupPage = () => {
 
         {/* Form Fields */}
         <Grid container spacing={2}>
-          <Grid item xs={12} md={6}>
-            <TextField
-              label="Full Name"
-              variant="outlined"
-              margin="normal"
-              fullWidth
-              value={formData.fullName}
-              onChange={handleChange}
-              name="fullName"
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <TextField
-              label="Age"
-              variant="outlined"
-              margin="normal"
-              fullWidth
-              value={formData.age}
-              onChange={handleChange}
-              name="age"
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <TextField
-              label="Blood Type"
-              variant="outlined"
-              margin="normal"
-              fullWidth
-              value={formData.bloodType}
-              onChange={handleChange}
-              name="bloodType"
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <TextField
-              label="Email"
-              variant="outlined"
-              margin="normal"
-              fullWidth
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              name="email"
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <TextField
-              label="Phone"
-              variant="outlined"
-              margin="normal"
-              fullWidth
-              value={formData.phone}
-              onChange={handleChange}
-              name="phone"
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <TextField
-              label="Address"
-              variant="outlined"
-              margin="normal"
-              fullWidth
-              value={formData.address}
-              onChange={handleChange}
-              name="address"
-              required
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <TextField
-              label="Allergies"
-              variant="outlined"
-              margin="normal"
-              fullWidth
-              value={formData.allergies}
-              onChange={handleChange}
-              name="allergies"
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <TextField
-              label="Chronic Conditions"
-              variant="outlined"
-              margin="normal"
-              fullWidth
-              value={formData.chronicConditions}
-              onChange={handleChange}
-              name="chronicConditions"
-            />
-          </Grid>
+          {[
+            { label: 'Full Name', name: 'fullName', type: 'text', required: true },
+            { label: 'Age', name: 'age', type: 'number', required: true },
+            { label: 'Blood Type', name: 'bloodType', type: 'text' },
+            { label: 'Email', name: 'email', type: 'email', required: true },
+            { label: 'Phone', name: 'phone', type: 'text', required: true },
+            { label: 'Address', name: 'address', type: 'text' },
+            { label: 'Allergies', name: 'allergies', type: 'text' },
+            { label: 'Chronic Conditions', name: 'chronicConditions', type: 'text' },
+          ].map((field, index) => (
+            <Grid item xs={12} md={6} key={index}>
+              <TextField
+                label={field.label}
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                type={field.type}
+                value={formData[field.name]}
+                onChange={handleChange}
+                name={field.name}
+                required={field.required}
+              />
+            </Grid>
+          ))}
 
           {/* Password Fields */}
-          <Grid item xs={12}>
-            <TextField
-              label="Password"
-              variant="outlined"
-              margin="normal"
-              fullWidth
-              type={showPassword ? 'text' : 'password'}
-              value={formData.password}
-              onChange={handleChange}
-              name="password"
-              required
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={togglePasswordVisibility}>
-                      {showPassword ? <Visibility /> : <VisibilityOff />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              label="Confirm Password"
-              variant="outlined"
-              margin="normal"
-              fullWidth
-              type={showPassword ? 'text' : 'password'}
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              name="confirmPassword"
-              required
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={togglePasswordVisibility}>
-                      {showPassword ? <Visibility /> : <VisibilityOff />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </Grid>
+          {[
+            { label: 'Password', name: 'password' },
+            { label: 'Confirm Password', name: 'confirmPassword' },
+          ].map((field, index) => (
+            <Grid item xs={12} key={index}>
+              <TextField
+                label={field.label}
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                type={showPassword ? 'text' : 'password'}
+                value={formData[field.name]}
+                onChange={handleChange}
+                name={field.name}
+                required
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={togglePasswordVisibility}>
+                        {showPassword ? <Visibility /> : <VisibilityOff />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+          ))}
+
+          {/* File Upload */}
           <Grid item xs={12}>
             <Typography variant="body1" gutterBottom>
               Upload Profile Picture

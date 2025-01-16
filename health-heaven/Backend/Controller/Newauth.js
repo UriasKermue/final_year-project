@@ -1,66 +1,130 @@
-// Controller/auth.js
-const NewUser = require('../models/Newuser'); // Use NewUser model for both registration and login
+const NewUser = require('../models/Newuser');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const sendEmail = require('../utils/sendEmail'); // Import the sendEmail function
+const sendEmail = require('../utils/sendEmail');
 
-// Register (Sign Up) user
+// Register User
 const register = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const {
+      fullName,
+      age,
+      bloodType,
+      email,
+      phone,
+      address,
+      allergies,
+      chronicConditions,
+      password,
+      confirmPassword,
+    } = req.body;
 
-    // Check if user already exists
-    const existingUser = await NewUser.findOne({ email }); // Use NewUser model for registration
-    if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
+    // Validate required fields
+    if (!fullName || !age || !email || !phone || !password || !confirmPassword) {
+      return res.status(400).json({ success: false, message: 'All required fields must be filled!' });
     }
 
-    // Hash password
+    // Age validation
+    if (isNaN(age) || age <= 0) {
+      return res.status(400).json({ success: false, message: 'Age must be a valid number greater than 0!' });
+    }
+
+    // Password validation
+    if (password.length < 8 || !/[A-Z]/.test(password) || !/[!@#$%^&*]/.test(password) || !/\d/.test(password)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 8 characters long, include a special character, an uppercase letter, and a number',
+      });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({ success: false, message: 'Passwords do not match!' });
+    }
+
+    // Email validation
+    const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ success: false, message: 'Invalid email format!' });
+    }
+
+    // Check if email already exists
+    const existingUser = await NewUser.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ success: false, message: 'Email is already in use!' });
+    }
+
+    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create new user
     const newUser = new NewUser({
-      username,
+      fullName,
+      age,
+      bloodType,
       email,
+      phone,
+      address,
+      allergies,
+      chronicConditions,
       password: hashedPassword,
     });
 
-    // Save user to DB
     await newUser.save();
 
-    // Send email on successful signup
-    const emailText = `Hi ${username},\n\nWelcome to Healthify! Your account has been created successfully.\n\nRegards,\nHealthify Team`;
-    await sendEmail(email, 'Welcome to Healthify', emailText);
+    // Send welcome email
+    const subject = 'Welcome to Healthify';
+    const emailText = `Hi ${fullName},\n\nWelcome to Healthify! Your account has been created successfully.\n\nRegards,\nHealthify Team`;
 
-    res.status(201).json({ message: 'User registered successfully' });
+    try {
+      await sendEmail(email, subject, emailText);
+      console.log(`Email sent successfully to: ${email}`); // Log success message
+    } catch (emailError) {
+      console.error('Error sending email:', emailError);
+      return res.status(500).json({ success: false, message: 'Account created but email delivery failed' });
+    }
+
+    res.status(201).json({ success: true, message: `Welcome, ${fullName}! Account created successfully.` });
   } catch (error) {
     console.error('Error registering user:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
 
-// Login user (using the same model as registration)
-const login = async (req, res) => {  // Renamed to 'login' for clarity
+// Login User
+const login = async (req, res) => {
   try {
-    const { email, password } = req.body; // Use email for login
+    const { email, password } = req.body;
 
-    // Find user using the same model as used for registration
-    const user = await NewUser.findOne({ email }); // Use NewUser model for login
+    if (!email || !password) {
+      return res.status(400).json({ success: false, message: 'Email and password are required!' });
+    }
+
+    const user = await NewUser.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ success: false, message: 'User not found!' });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password); // Compare password hashes
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Incorrect password' });
+      return res.status(401).json({ success: false, message: 'Incorrect password!' });
     }
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token, message: 'Login successful' });
+    const token = jwt.sign(
+      { userId: user._id, email: user.email, fullName: user.fullName },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    res.json({
+      success: true,
+      token,
+      expiresIn: 3600,
+      message: 'Login successful',
+    });
   } catch (error) {
     console.error('Error logging in:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
 
-module.exports = { register, login }; // Export login instead of newlogin
+module.exports = { register, login };

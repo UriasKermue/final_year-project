@@ -1,5 +1,5 @@
 const request = require('supertest');
-const app = require('../server'); // Adjust if your server setup is different
+const app = require('../../index'); // Adjust if your server setup is different
 
 describe('Auth API', () => {
   it('should sign up a user', async () => {
