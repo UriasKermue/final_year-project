@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 
 const NewauthMiddleware = (req, res, next) => {
+  console.log('Authorization Header:', req.headers['authorization']); // Add this line to check the header
+
   // Extract token from the 'Authorization' header and remove 'Bearer ' prefix if present
   const token = req.headers['authorization']?.split(' ')[1];
 

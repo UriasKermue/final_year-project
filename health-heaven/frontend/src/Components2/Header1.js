@@ -11,9 +11,43 @@ import InfoIcon from "@mui/icons-material/Info";
 import LoginIcon from "@mui/icons-material/Login";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import DashboardIcon from "@mui/icons-material/Dashboard"; // Import Dashboard Icon
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { FaUserCircle } from "react-icons/fa";
 
 const Header = () => {
+  const [userProfile, setUserProfile] = useState([]);
+  const navigate = useNavigate();
   const iconStyle = { fontSize: "18px", marginRight: "8px" }; // Adjust icon size
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem("token"); // Assuming you store the token in localStorage
+        if (!token) {
+          console.log("No token found");
+          return;
+        }
+
+      
+        console.log("Token:", token);    
+        const userResponse = await axios.get('http://localhost:5000/api/newauth/user', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        });
+        setUserProfile(userResponse.data.user);
+      
+          console.log("User Data:", userResponse.data.user);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      
+        navigate("/login"); 
+      }
+    };
+
+    fetchUserData(); 
+  }, []);
 
   return (
     <Box>
@@ -84,12 +118,17 @@ const Header = () => {
           <Button color="inherit" component={Link} to="/support">
             <ContactMailIcon style={iconStyle} /> Support
           </Button>
-          <Button color="inherit" component={Link} to="/login">
+          <div className="flex items-center justify-between space-x-1" >            
+          <FaUserCircle className="text-green-600  " size={20} />
+          <p className="font-semibold mb-1" >
+            {userProfile.fullName}</p>
+          </div>
+          {/* <Button color="inherit" component={Link} to="/login">
             <LoginIcon style={iconStyle} /> Login
           </Button>
           <Button color="inherit" component={Link} to="/signup">
             <PersonAddIcon style={iconStyle} /> Signup
-          </Button>
+          </Button> */}
         </Toolbar>
       </AppBar>
     </Box>

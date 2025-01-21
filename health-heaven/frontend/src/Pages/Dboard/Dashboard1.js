@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import Sidebar from './layout/Sidebar';
 import Header from './layout/Header';
 import DashboardContent from '../Dboard/pages/Dashboard'; // Renamed import
@@ -11,45 +13,63 @@ import SettingsPage from './pages/Settings';
 function Dashboard() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  
-  const [userProfile] = useState({
-    name: "John Doe",
-    age: 32,
-    bloodType: "A+",
-    height: 175,
-    emergencyContact: "Jane Doe (+1 234-567-8900)",
-    lastCheckup: "2024-02-15",
-    profileImage: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-  });
 
-  const [appointments] = useState([
-    { id: 1, doctor: "Dr. Sarah Smith", date: "2024-03-20", time: "10:00 AM", specialty: "Cardiologist" },
-    { id: 2, doctor: "Dr. John Davis", date: "2024-03-25", time: "2:30 PM", specialty: "General Physician" },
-  ]);
+  const [userProfile, setUserProfile] = useState([]);
+  const [appointments, setAppointments] = useState([]);
+  const [healthMetrics, setHealthMetrics] = useState([]);
 
-  const [healthMetrics] = useState([
-    { 
-      date: "2024-03-15",
-      weight: 70,
-      bloodPressure: "120/80",
-      heartRate: 72,
-      temperature: 36.6,
-      bloodSugar: 95,
-      sleepHours: 7.5,
-      stressLevel: 3
-    },
-    { 
-      date: "2024-03-14",
-      weight: 70.5,
-      bloodPressure: "118/79",
-      heartRate: 70,
-      temperature: 36.5,
-      bloodSugar: 92,
-      sleepHours: 8,
-      stressLevel: 2
-    },
-  ]);
+  const navigate = useNavigate(); // Initialize navigate for redirecting
 
+  // Fetch user data, appointments, and health metrics from the backend
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem("token"); // Assuming you store the token in localStorage
+        if (!token) {
+          console.log("No token found");
+          navigate("/login"); // Redirect to login if no token
+          return;
+        }
+
+        // Log token to confirm it's being retrieved correctly
+        console.log("Token:", token);
+
+        // Fetch user profile data with the token
+        const userResponse = await axios.get('http://localhost:5000/api/newauth/user', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        });
+        setUserProfile(userResponse.data.user);
+         // Set user profile from response
+          console.log("User Data:", userResponse.data.user);
+        // Fetch appointments
+        // const appointmentsResponse = await axios.get('http://localhost:5000/api/appointments', {
+        //   headers: {
+        //     Authorization: `Bearer ${token}`,
+        //   }
+        // });
+        // setAppointments(appointmentsResponse.data); // Set appointments from response
+
+        // Fetch health metrics
+        // const healthMetricsResponse = await axios.get('http://localhost:5000/api/health-metrics', {
+        //   headers: {
+        //     Authorization: `Bearer ${token}`,
+        //   }
+        // });
+        // setHealthMetrics(healthMetricsResponse.data); // Set health metrics from response
+
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        // Optionally, handle errors here (e.g., showing an alert or redirecting to login)
+        navigate("/login"); // Redirect to login if there’s any error
+      }
+    };
+
+    fetchUserData(); // Call the function to fetch user data
+  }, [navigate]);
+
+  // Render the page based on the active tab
   const renderPage = () => {
     switch (activeTab) {
       case 'dashboard':
@@ -61,7 +81,8 @@ function Dashboard() {
       case 'analytics':
         return <AnalyticsPage healthMetrics={healthMetrics} />;
       case 'profile':
-        return <ProfilePage userProfile={userProfile} />;
+        // Check if userProfile has been fetched, if so pass it to ProfilePage
+        return userProfile ? <ProfilePage userProfile={userProfile} /> : <div>Loading...</div>;
       case 'settings':
         return <SettingsPage />;
       default:
@@ -82,7 +103,7 @@ function Dashboard() {
 
       <div className="flex-1">
         <Header activeTab={activeTab} userProfile={userProfile} />
-        
+
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {renderPage()}
         </main>

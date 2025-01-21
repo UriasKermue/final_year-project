@@ -51,12 +51,12 @@ export default function Sidebar({
         <div className="p-4 border-b">
           <div className="flex items-center space-x-4">
             <img
-              src={userProfile.profileImage}
+             src={userProfile.profileImage ? `http://localhost:5000${userProfile.profileImage}` : "/default-profile.png"}
               alt="Profile"
               className="h-12 w-12 rounded-full"
             />
             <div>
-              <h3 className="font-medium text-gray-900">{userProfile.name}</h3>
+              <h3 className="font-medium text-gray-900">{userProfile.fullName}</h3>
               <p className="text-sm text-gray-500">
                 Age: {userProfile.age} • Blood: {userProfile.bloodType}
               </p>

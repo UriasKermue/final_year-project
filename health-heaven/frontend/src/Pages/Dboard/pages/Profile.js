@@ -9,12 +9,12 @@ export default function ProfilePage({ userProfile }) {
         <div className="px-6 pb-6">
           <div className="flex flex-col sm:flex-row sm:items-end -mt-16 space-y-4 sm:space-y-0 sm:space-x-4">
             <img
-              src={userProfile.profileImage}
+             src={`http://localhost:5000${userProfile.profileImage}`}
               alt={userProfile.name}
               className="h-32 w-32 rounded-full border-4 border-white shadow-md"
             />
             <div className="space-y-1">
-              <h1 className="text-2xl font-bold text-gray-900">{userProfile.name}</h1>
+              <h1 className="text-2xl font-bold text-gray-900">{userProfile.fullName}</h1>
               <p className="text-gray-500">Patient ID: #123456</p>
             </div>
           </div>
@@ -55,15 +55,15 @@ export default function ProfilePage({ userProfile }) {
             <div className="space-y-3">
               <div className="flex items-center space-x-3 text-gray-600">
                 <Mail className="h-5 w-5" />
-                <span>john.doe@example.com</span>
+                <span>{userProfile.email}</span>
               </div>
               <div className="flex items-center space-x-3 text-gray-600">
                 <Phone className="h-5 w-5" />
-                <span>+1 234-567-8900</span>
+                <span>{userProfile.phone}</span>
               </div>
               <div className="flex items-center space-x-3 text-gray-600">
                 <MapPin className="h-5 w-5" />
-                <span>123 Health Street, Medical City</span>
+                <span>{userProfile.address}</span>
               </div>
             </div>
           </div>
@@ -75,11 +75,11 @@ export default function ProfilePage({ userProfile }) {
             <div className="space-y-4">
               <div className="p-4 bg-gray-50 rounded-lg">
                 <p className="font-medium text-gray-900">Allergies</p>
-                <p className="text-gray-600 mt-1">Penicillin, Peanuts</p>
+                <p className="text-gray-600 mt-1">{userProfile.allergies}</p>
               </div>
               <div className="p-4 bg-gray-50 rounded-lg">
                 <p className="font-medium text-gray-900">Chronic Conditions</p>
-                <p className="text-gray-600 mt-1">None</p>
+                <p className="text-gray-600 mt-1">{userProfile.chronicConditions}</p>
               </div>
               <div className="p-4 bg-gray-50 rounded-lg">
                 <p className="font-medium text-gray-900">Past Surgeries</p>

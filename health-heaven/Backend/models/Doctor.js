@@ -10,10 +10,9 @@ const doctorSchema = new mongoose.Schema({
   contactInfo: {
     phone: { type: String },
     email: { type: String },
-    website: { type: String },
   },
   education: [{ type: String }], // A list of qualifications like MBBS, MD, etc.
-  imageUrl: { type: String }, // Add image URL field here
+  imageUrl: { type: String, default: '/uploads/default-avatar.png' }, // Add image URL field here
 });
 
 const Doctor = mongoose.model('Doctor', doctorSchema);

@@ -118,7 +118,7 @@ const login = async (req, res) => {
     res.json({
       success: true,
       token,
-      expiresIn: 3600,
+      expiresIn: '1h',
       message: 'Login successful',
     });
   } catch (error) {
@@ -127,4 +127,24 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, login };
+const getUserDetails = async (req, res) => {
+  try {
+    // Use the userId from the verified token (attached to req.user by middleware)
+    const { userId } = req.user; // Extract userId from the authenticated user's data
+
+    // Find the user by userId (no need to use req.body)
+    const user = await NewUser.findById(userId).select('-password');
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found!' });
+    }
+
+    res.status(200).json({ success: true, user });
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+
+module.exports = { register, login , getUserDetails};
