@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const Newuser = require('../models/Newuser');  // Updated import to 'newuser.js'
 
+
 const authenticate = async (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
 
