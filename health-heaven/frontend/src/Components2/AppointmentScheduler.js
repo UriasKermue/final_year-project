@@ -30,18 +30,25 @@ const AppointmentScheduler = () => {
   }, []);
 
   const handleChange = (e) => {
-    setAppointmentData({
-      ...appointmentData,
-      [e.target.name]: e.target.value,
+    const { name, value } = e.target;
+    setAppointmentData(prev => {
+      const newData = { ...prev, [name]: value };
+      
+      // If selecting a doctor, also update the doctor's image
+      if (name === 'doctorName') {
+        const selectedDoctor = doctors.find(d => d.name === value);
+        if (selectedDoctor) {
+          newData.doctorImage = selectedDoctor.imageURL;
+        }
+      }
+      
+      return newData;
     });
   };
 
   const validateForm = () => {
     const errors = {};
     if (!appointmentData.doctorName) errors.doctorName = 'Doctor name is required';
-    else if (!doctors.some(doctor => doctor.name.toLowerCase() === appointmentData.doctorName.toLowerCase())) {
-      errors.doctorName = 'Doctor name does not match any available doctor';
-    }
     if (!appointmentData.email) errors.email = 'Email is required';
     else if (!/\S+@\S+\.\S+/.test(appointmentData.email)) errors.email = 'Email address is invalid';
     if (!appointmentData.date) errors.date = 'Appointment date is required';
@@ -61,11 +68,6 @@ const AppointmentScheduler = () => {
     setLoading(true);
 
     try {
-      const doctor = doctors.find(d => d.name === appointmentData.doctorName);
-      if (doctor) {
-        appointmentData.doctorImage = doctor.imageURL;
-      }
-
       const response = await axios.post('http://localhost:5000/api/appointments', appointmentData);
       setAppointments([...appointments, response.data]);
       setSuccess('Appointment scheduled successfully!');
@@ -141,6 +143,20 @@ const AppointmentScheduler = () => {
     }
   };
 
+  const DoctorOption = ({ doctor }) => (
+    <div className="flex items-center gap-3 px-2 py-1">
+      <img
+        src={doctor.imageURL}
+        alt={doctor.name}
+        className="w-8 h-8 rounded-full object-cover"
+      />
+      <div>
+        <div className="font-medium">{doctor.name}</div>
+        <div className="text-sm text-gray-500">{doctor.specialization}</div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
@@ -166,22 +182,36 @@ const AppointmentScheduler = () => {
         <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-md p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Doctor Name</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Select Doctor</label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <input
-                  type="text"
+                <select
                   name="doctorName"
                   value={appointmentData.doctorName}
                   onChange={handleChange}
                   className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
                     formErrors.doctorName ? 'border-red-500' : 'border-gray-300'
-                  } focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
-                  placeholder="Enter doctor's name"
-                />
+                  } focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none bg-white`}
+                >
+                  <option value="">Select a doctor</option>
+                  {doctors.map((doctor) => (
+                    <option key={doctor._id} value={doctor.name}>
+                      {doctor.name} - {doctor.specialization}
+                    </option>
+                  ))}
+                </select>
               </div>
               {formErrors.doctorName && (
                 <p className="mt-1 text-sm text-red-600">{formErrors.doctorName}</p>
+              )}
+              {appointmentData.doctorName && (
+                <div className="mt-2">
+                  {doctors.map((doctor) => (
+                    doctor.name === appointmentData.doctorName && (
+                      <DoctorOption key={doctor._id} doctor={doctor} />
+                    )
+                  ))}
+                </div>
               )}
             </div>
 
@@ -300,7 +330,7 @@ const AppointmentScheduler = () => {
                     className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                   >
                     <img
-                      src={appointment.doctorImage || 'https://via.placeholder.com/60x60'}
+                      src={appointment.imageUrl || 'https://via.placeholder.com/60x60'}
                       alt={appointment.doctorName}
                       className="w-16 h-16 rounded-full object-cover"
                     />
@@ -361,9 +391,113 @@ const AppointmentScheduler = () => {
               </div>
 
               <form onSubmit={handleEditSubmit} className="space-y-6">
-                {/* Same form fields as the main form */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* ... Copy the form fields from above ... */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Select Doctor</label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                      <select
+                        name="doctorName"
+                        value={appointmentData.doctorName}
+                        onChange={handleChange}
+                        className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
+                          formErrors.doctorName ? 'border-red-500' : 'border-gray-300'
+                        } focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none bg-white`}
+                      >
+                        <option value="">Select a doctor</option>
+                        {doctors.map((doctor) => (
+                          <option key={doctor._id} value={doctor.name}>
+                            {doctor.name} - {doctor.specialization}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    {formErrors.doctorName && (
+                      <p className="mt-1 text-sm text-red-600">{formErrors.doctorName}</p>
+                    )}
+                    {appointmentData.doctorName && (
+                      <div className="mt-2">
+                        {doctors.map((doctor) => (
+                          doctor.name === appointmentData.doctorName && (
+                            <DoctorOption key={doctor._id} doctor={doctor} />
+                          )
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                      <input
+                        type="email"
+                        name="email"
+                        value={appointmentData.email}
+                        onChange={handleChange}
+                        className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
+                          formErrors.email ? 'border-red-500' : 'border-gray-300'
+                        } focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
+                        placeholder="Enter your email"
+                      />
+                    </div>
+                    {formErrors.email && (
+                      <p className="mt-1 text-sm text-red-600">{formErrors.email}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                    <div className="relative">
+                      <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                      <input
+                        type="date"
+                        name="date"
+                        value={appointmentData.date}
+                        onChange={handleChange}
+                        className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
+                          formErrors.date ? 'border-red-500' : 'border-gray-300'
+                        } focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
+                      />
+                    </div>
+                    {formErrors.date && (
+                      <p className="mt-1 text-sm text-red-600">{formErrors.date}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Time</label>
+                    <div className="relative">
+                      <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                      <input
+                        type="time"
+                        name="time"
+                        value={appointmentData.time}
+                        onChange={handleChange}
+                        className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
+                          formErrors.time ? 'border-red-500' : 'border-gray-300'
+                        } focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
+                      />
+                    </div>
+                    {formErrors.time && (
+                      <p className="mt-1 text-sm text-red-600">{formErrors.time}</p>
+                    )}
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Additional Notes</label>
+                    <div className="relative">
+                      <FileText className="absolute left-3 top-3 text-gray-400 h-5 w-5" />
+                      <textarea
+                        name="notes"
+                        value={appointmentData.notes}
+                        onChange={handleChange}
+                        rows={4}
+                        className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        placeholder="Any special requirements or conditions..."
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex justify-end gap-4">

@@ -10,26 +10,36 @@ const router = express.Router();
 /**
  * POST Route: Create a new user with profile image upload
  */
-router.post('/newuser', upload, async (req, res) => {
+router.post('/newuser', upload.single('userImage'), async (req, res) => {
   try {
-    const { fullName, email, age, bloodType, phone, address, allergies, chronicConditions, password } = req.body;
+    const {
+      fullName,
+      email,
+      age,
+      bloodType,
+      phone,
+      address,
+      allergies,
+      chronicConditions,
+      password,
+    } = req.body;
 
     // Validate required fields
     if (!fullName || !email || !password) {
-      return res.status(400).json({ message: 'Full name, email, and password are required' });
+      return res.status(400).json({ message: 'Full name, email, and password are required.' });
     }
 
     // Check if the user already exists
     const existingUser = await Newuser.findOne({ email });
     if (existingUser) {
-      return res.status(409).json({ message: 'User already exists' });
+      return res.status(409).json({ message: 'User already exists.' });
     }
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10); // Salt rounds set to 10
 
     // Get the profile image URL if uploaded
-    const profileImage = req.file ? `/uploads/${req.file.filename}` : null;
+    const profileImage = req.file ? `/uploads/users/${req.file.filename}` : null;
 
     // Create a new user
     const newUser = new Newuser({
@@ -48,10 +58,19 @@ router.post('/newuser', upload, async (req, res) => {
     // Save the user to the database
     await newUser.save();
 
-    res.status(201).json({ message: 'User created successfully', user: newUser });
+    // Return selective user details for the response
+    res.status(201).json({
+      message: 'User created successfully.',
+      user: {
+        id: newUser._id,
+        fullName: newUser.fullName,
+        email: newUser.email,
+        profileImage: newUser.profileImage,
+      },
+    });
   } catch (error) {
     console.error('Error creating user:', error.message);
-    res.status(500).json({ message: 'Error creating user', error: error.message });
+    res.status(500).json({ message: 'Error creating user.', error: error.message });
   }
 });
 
@@ -72,7 +91,7 @@ router.get('/newuser', NewauthMiddleware, async (req, res) => {
 
     // Check if user exists
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: 'User not found.' });
     }
 
     // Respond with user data
@@ -89,7 +108,7 @@ router.get('/newuser', NewauthMiddleware, async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching user data:', error.message);
-    res.status(500).json({ message: 'Error retrieving user data', error: error.message });
+    res.status(500).json({ message: 'Error retrieving user data.', error: error.message });
   }
 });
 

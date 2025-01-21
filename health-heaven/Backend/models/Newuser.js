@@ -1,4 +1,3 @@
-// models/User.js
 const mongoose = require('mongoose');
 
 const NewuserSchema = new mongoose.Schema({
@@ -12,6 +11,8 @@ const NewuserSchema = new mongoose.Schema({
   chronicConditions: { type: String },
   profileImage: { type: String }, // Store the URL of the uploaded image
   password: { type: String, required: true },
+  resetToken: { type: String }, // New field for password reset tokens
+  tokenExpiry: { type: Date },  // New field for token expiry timestamps
 }, { timestamps: true });
 
 const User = mongoose.model('Newuser', NewuserSchema);

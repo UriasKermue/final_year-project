@@ -10,6 +10,9 @@ import AppointmentScheduler from './Components2/AppointmentScheduler';
 import MedicationReminder from './Components2/MedicationReminder';
 import MedicalRecord from './Components2/MedicalRecord';
 import Forgetpassword from './Pages/Forgetpassword';
+import VerifyOtpPage from './Pages/Dboard/pages/VerifyOtpPage'; 
+// import ResetPasswordPage from './Pages/Dboard/pagge/ResetPasswordPage';
+import ResetForgetPassword from './Pages/ResetForgetPassword';
 import EducationResources from './Components2/EducationResources';
 import AboutPage from './Pages/AboutPage';
 import SupportPage from './Pages/SupportPage';
@@ -31,7 +34,7 @@ const Main = () => {
   const location = useLocation();
 
   // Check if the current route should not display the Header and Footer
-  const isNoHeaderFooterPage = ['/', '/login', '/signup', '/forgetpassword', '/dashboard1'].includes(location.pathname);
+  const isNoHeaderFooterPage = ['/', '/login', '/signup', '/forgetpassword', '/verifyOtppage', '/resetforgetpassword', '/dashboard1'].includes(location.pathname);
 
   return (
     <>
@@ -44,6 +47,8 @@ const Main = () => {
         <Routes>
           <Route path="/" element={<Start />} />
           <Route path="/forgetpassword" element={<Forgetpassword />} />
+          <Route path="/verifyOtppage" element={<VerifyOtpPage />} />
+          <Route path="/resetforgetpassword" element={<ResetForgetPassword />} />  
           <Route path="/homepage" element={<HomePage />} />
           <Route path="/dashboard1" element={<Dashboard />} />
           <Route path="/appointments" element={<AppointmentScheduler />} />

@@ -26,7 +26,7 @@ const SignupPage = () => {
     address: '',
     allergies: '',
     chronicConditions: '',
-    profileImage: null,
+    userImage: null, // Updated to match `userImage` field in backend
     password: '',
     confirmPassword: '',
   });
@@ -40,7 +40,7 @@ const SignupPage = () => {
   };
 
   const handleFileChange = (e) => {
-    setFormData({ ...formData, profileImage: e.target.files[0] });
+    setFormData({ ...formData, userImage: e.target.files[0] });
   };
 
   const togglePasswordVisibility = () => {
@@ -204,7 +204,7 @@ const SignupPage = () => {
             <Typography variant="body1" gutterBottom>
               Upload Profile Picture
             </Typography>
-            <input type="file" accept="image/*" onChange={handleFileChange} />
+            <input type="file" accept="image/*" name="userImage" onChange={handleFileChange} />
           </Grid>
         </Grid>
 
