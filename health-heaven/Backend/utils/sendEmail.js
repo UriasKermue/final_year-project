@@ -1,33 +1,37 @@
 const nodemailer = require('nodemailer');
-require('dotenv').config(); // Automatically load environment variables
+require('dotenv').config(); // Load environment variables
 
-// Create a reusable transporter
+// Create a transporter using Gmail's SMTP service
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.EMAIL_USER, // Sender email
-    pass: process.env.EMAIL_PASS, // Email password or app password
+    user: process.env.EMAIL_USER, // Use the updated key
+    pass: process.env.EMAIL_PASS, // Use the updated key
   },
 });
 
-// Email sending function
-const sendEmail = async (to, subject, text) => {
+// Send notification email
+const sendEmail = async ({ to, subject, text, htmlContent }) => { 
+  if (!to) {
+    console.error('No recipient defined.');
+    return; // Exit early if no recipient is defined
+  }
+
+  // Define email options
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to, // Specify the recipient's email
+    subject, // Subject of the email
+    text,    // Plain-text body
+    html: htmlContent,  // HTML content for the email
+  };
+
   try {
-    const info = await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to,
-      subject,
-      text,
-    });
-    
-    // Log success message along with the response from the email service
-    console.log(`Email sent successfully to ${to}. Message ID: ${info.messageId}`);
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully:', info.response);
   } catch (error) {
-    // Log detailed error for troubleshooting
-    console.error('Error sending email:', error);
-    if (error.response) {
-      console.error('SMTP Server Response:', error.response);
-    }
+    console.error('Error sending email:', error.message);
+    console.error('Error stack trace:', error.stack);
   }
 };
 

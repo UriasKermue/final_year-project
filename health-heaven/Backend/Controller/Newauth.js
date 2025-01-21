@@ -2,6 +2,8 @@ const NewUser = require('../models/Newuser');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const sendEmail = require('../utils/sendEmail');
+const WelcomeEmail = require('../utils/test/WelcomeEmail');
+
 
 // Register User
 const register = async (req, res) => {
@@ -71,24 +73,31 @@ const register = async (req, res) => {
 
     await newUser.save();
 
-    // Send welcome email
-    const subject = 'Welcome to Healthify';
-    const emailText = `Hi ${fullName},\n\nWelcome to Healthify! Your account has been created successfully.\n\nRegards,\nHealthify Team`;
+   // Generate HTML content for the welcome email
+   const htmlContent = WelcomeEmail(fullName);
+   console.log("HTML Content Generated: ", htmlContent); // Debugging HTML content
 
-    try {
-      await sendEmail(email, subject, emailText);
-      console.log(`Email sent successfully to: ${email}`); // Log success message
-    } catch (emailError) {
-      console.error('Error sending email:', emailError);
-      return res.status(500).json({ success: false, message: 'Account created but email delivery failed' });
-    }
+   // Send welcome emailk
+   try {
+     await sendEmail({
+       to: email, // Ensure this is correctly populated
+       subject: 'Welcome Message',
+       text: 'Registration Done.', // Plain text fallback
+       html: htmlContent, // Pass the generated HTML content here
+     });
+     console.log(`Welcome email sent successfully to: ${email}`);
+   } catch (emailError) {
+     console.error('Error sending welcome email:', emailError); // More detailed logs
+     return res.status(500).json({ success: false, message: 'Account created but email delivery failed' });
+   }
 
-    res.status(201).json({ success: true, message: `Welcome, ${fullName}! Account created successfully.` });
-  } catch (error) {
-    console.error('Error registering user:', error);
-    res.status(500).json({ success: false, message: 'Internal server error' });
-  }
+   res.status(201).json({ success: true, message: `Welcome, ${fullName}! Account created successfully.` });
+ } catch (error) {
+   console.error('Error registering user:', error);
+   res.status(500).json({ success: false, message: 'Internal server error' });
+ }
 };
+
 
 // Login User
 const login = async (req, res) => {
