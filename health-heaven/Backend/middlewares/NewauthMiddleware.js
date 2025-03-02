@@ -1,22 +1,38 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
+const User = require("../models/Newuser");
 
-const NewauthMiddleware = (req, res, next) => {
-  // Extract token from the 'Authorization' header and remove 'Bearer ' prefix if present
-  const token = req.headers['authorization']?.split(' ')[1];
+const NewauthMiddleware = async (req, res, next) => {
+  try {
+    // ✅ Extract the token from Authorization header
+    const token = req.headers.authorization?.split(" ")[1];
 
-  if (!token) return res.status(403).json({ message: 'No token provided' });
+    if (!token) {
+      return res.status(403).json({ message: "No token provided" });
+    }
 
-  // Verify the token
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) return res.status(401).json({ message: 'Failed to authenticate token' });
+    // ✅ Verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Attach userId (and optionally username) to the request object
-    req.user = {}; // Ensure the 'user' object exists
-    req.user.userId = decoded.userId; // Assuming 'userId' is in the token payload
-    req.user.username = decoded.username; // If 'username' is needed in the payload
+    // ✅ Fetch the user from the database
+    const user = await User.findById(decoded.userId);
 
-    next(); // Proceed to the next middleware or route handler
-  });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // ✅ Ensure the user is active
+    if (user.status !== "active") {
+      return res.status(403).json({ message: "Access denied. User is inactive or blocked" });
+    }
+
+    // ✅ Attach the user to the request object
+    req.user = user;
+
+    next(); // Proceed to the next middleware/route handler
+  } catch (error) {
+    console.error("User authentication error:", error);
+    return res.status(401).json({ message: "Invalid or expired token" });
+  }
 };
 
 module.exports = NewauthMiddleware;

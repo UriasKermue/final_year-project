@@ -1,3 +1,7 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* #5f6fff */
+
+ ::-webkit-scrollbar{
+  @apply hidden
+}

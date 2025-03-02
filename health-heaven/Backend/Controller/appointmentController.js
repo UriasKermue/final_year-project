@@ -1,90 +1,139 @@
-const Appointment = require('../models/Appointment');
-const nodemailer = require('nodemailer');
+const mongoose = require("mongoose");
+const Appointment = require("../models/AppointmentModel");
+const User = require("../models/Newuser");
+const Doctor = require("../models/DdoctorModel");
+const sendEmail = require("../utils/sendEmail");
 
-// Controller to create a new appointment
-const createAppointment = async (req, res) => {
-  const { doctorName, email, date, time, notes, doctorImage } = req.body; // Extract doctorImage as well
-
+// Book an Appointment
+exports.bookAppointment = async (req, res) => {
   try {
-    // Check for conflicting appointments
-    const conflictingAppointment = await Appointment.findOne({
-      doctorName,
+    const { doctorId, date, time, notes } = req.body;
+
+    if (!req.user || !req.user.userId) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized: User not authenticated" });
+    }
+
+    const doctor = await Doctor.findById(doctorId);
+    const user = await User.findById(req.user.userId);
+
+    if (!doctor || doctor.status !== "Approved") {
+      return res.status(400).json({ message: "Doctor is not available." });
+    }
+
+    if (!user) {
+      return res.status(400).json({ message: "User not found." });
+    }
+
+    const appointment = new Appointment({
+      user: req.user.userId,
+      doctor: doctorId,
       date,
       time,
-    });
-
-    if (conflictingAppointment) {
-      return res.status(400).json({ message: "Doctor is unavailable at this time." });
-    }
-
-    // Create a new appointment
-    const appointment = new Appointment({
-      doctorName, 
-      email, 
-      date, 
-      time, 
       notes,
-      doctorImage: doctorImage || null,  // Optional field for doctorImage
+      status: "Pending",
     });
 
-    // Save the appointment to the database
     await appointment.save();
 
-    // Set up the email transporter using nodemailer
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL_SENDER,
-        pass: process.env.EMAIL_PASSWORD,
-      },
+    // Send Email Notifications
+    await sendEmail({
+      to: user.email,
+      subject: "Appointment Pending Doctor's Approval",
+      text: `Your appointment with Dr. ${doctor.fullName} on ${date} at ${time} is pending approval.`,
     });
 
-    // Send email notification to system owner
-    try {
-      await transporter.sendMail({
-        from: process.env.EMAIL_SENDER,
-        to: process.env.EMAIL_RECEIVER,
-        subject: "New Appointment Scheduled",
-        text: `New appointment scheduled:\n\nDoctor: ${doctorName}\nDate: ${date}\nTime: ${time}`,
-      });
-      console.log('Email sent successfully');
-    } catch (err) {
-      console.error('Error sending email:', err.message);
-      return res.status(500).json({ message: "Error notifying system owner via email", error: err.message });
-    }
+    await sendEmail({
+      to: doctor.email,
+      subject: "New Appointment Request",
+      text: `You have a new appointment request from ${user.fullName} on ${date} at ${time}.`,
+    });
 
-    // Respond with the saved appointment data
-    res.status(201).json(appointment);
-  } catch (err) {
-    console.error('Error creating appointment:', err.message);
-    res.status(500).json({ message: "Error creating appointment", error: err.message });
+    await sendEmail({
+      to: "hcare948@gmail.com",
+      subject: "New Appointment Request",
+      text: `${user.fullName} has booked an appointment with Dr. ${doctor.fullName} on ${date} at ${time}.`,
+    });
+
+    res
+      .status(201)
+      .json({ message: "Appointment booked! Waiting for doctor approval." });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error booking appointment", error: error.message });
   }
 };
 
-// Controller to get all appointments
-const getAppointments = async (req, res) => {
+// Edit Appointment
+exports.editAppointment = async (req, res) => {
   try {
-    const appointments = await Appointment.find();
-    res.status(200).json(appointments);
-  } catch (err) {
-    console.error('Error fetching appointments:', err.message);
-    res.status(500).json({ message: "Error fetching appointments", error: err.message });
-  }
-};
+    const { date, time, notes } = req.body;
+    const appointment = await Appointment.findById(req.params.id);
 
-// Controller to delete an appointment by ID
-const deleteAppointment = async (req, res) => {
-  try {
-    const appointment = await Appointment.findByIdAndDelete(req.params.id);
-    if (!appointment) {
+    if (!appointment)
       return res.status(404).json({ message: "Appointment not found" });
+    if (appointment.user.toString() !== req.user.userId) {
+      return res.status(403).json({ message: "Unauthorized: Access denied" });
     }
-    res.status(200).json({ message: "Appointment deleted successfully" });
-  } catch (err) {
-    console.error('Error deleting appointment:', err.message);
-    res.status(500).json({ message: "Error deleting appointment", error: err.message });
+
+    appointment.date = date || appointment.date;
+    appointment.time = time || appointment.time;
+    appointment.notes = notes || appointment.notes;
+    await appointment.save();
+
+    res.json({ message: "Appointment updated successfully" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error updating appointment", error: error.message });
   }
 };
 
-// Export the controller functions
-module.exports = { createAppointment, getAppointments, deleteAppointment };
+// Delete Appointment
+exports.deleteAppointment = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid appointment ID" });
+    }
+
+    const appointment = await Appointment.findById(id);
+    if (!appointment)
+      return res.status(404).json({ message: "Appointment not found" });
+    if (appointment.user.toString() !== req.user.userId) {
+      return res
+        .status(403)
+        .json({ message: "Unauthorized: You can't delete this appointment" });
+    }
+
+    await appointment.deleteOne();
+    res.json({ message: "Appointment deleted successfully" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error deleting appointment", error: error.message });
+  }
+};
+
+// Get User Appointments
+exports.getUserAppointments = async (req, res) => {
+  try {
+    if (!req.user || !req.user.userId) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized: User not authenticated" });
+    }
+
+    const appointments = await Appointment.find({
+      user: req.user.userId,
+    }).populate("doctor");
+    res.json(appointments);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error fetching appointments", error: error.message });
+  }
+};

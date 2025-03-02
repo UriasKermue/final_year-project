@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 const reminderSchema = new mongoose.Schema({
-  date: { type: Date, required: true }, // Full date (e.g., 2024-11-15)
-  time: { type: String, required: true }, // Time in HH:mm format (e.g., "14:30")
+  date: { type: Date, required: true },
+  time: { type: String, required: true },
   recurrence: { type: String, enum: ['None', 'Daily', 'Weekly', 'Monthly', 'Custom'], default: 'None' },
   notifications: {
     push: { type: Boolean, default: true },
@@ -10,9 +10,9 @@ const reminderSchema = new mongoose.Schema({
     sms: { type: Boolean, default: false },
   },
   message: { type: String, required: true },
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Assuming you have a User model for patient
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'Newuser', required: true },
+  sent: { type: Boolean, default: false }, // Field to track if the reminder has been sent
 });
 
 const Reminder = mongoose.model('Reminder', reminderSchema);
-
 module.exports = Reminder;

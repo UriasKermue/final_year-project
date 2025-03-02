@@ -27,7 +27,7 @@ const LoginPage = () => {
     setError(''); // Reset error state
 
     try {
-      const response = await axios.post('http://localhost:5000/api/newauth/login', {
+      const response = await axios.post('http://localhost:5000/api/newusers/login', {
         email,
         password,
       });

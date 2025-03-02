@@ -12,7 +12,8 @@ const NewuserSchema = new mongoose.Schema({
   profileImage: { type: String }, // Store the URL of the uploaded image
   password: { type: String, required: true },
   resetToken: { type: String }, // New field for password reset tokens
-  tokenExpiry: { type: Date },  // New field for token expiry timestamps
+  tokenExpiry: { type: Date }, 
+  status: { type: String, enum: ["Active", "Banned"], default: "Active" }, // New field for token expiry timestamps
 }, { timestamps: true });
 
 const User = mongoose.model('Newuser', NewuserSchema);

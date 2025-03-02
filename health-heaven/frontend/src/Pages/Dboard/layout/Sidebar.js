@@ -1,6 +1,7 @@
 import React from 'react';
 import { Activity, LogOut } from 'lucide-react';
 import Navigation from './Navigation';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function Sidebar({
   isSidebarOpen,
@@ -10,8 +11,25 @@ export default function Sidebar({
   userProfile,
   healthMetrics,
 }) {
+  const navigate = useNavigate(); // Initialize the navigate function from react-router-dom
+
   const handleLogout = () => {
     console.log('Logging out...');
+    // Clear token on logout
+    localStorage.removeItem('token');
+    navigate('/login'); // Navigate to login after logout
+  };
+
+  const handleNavigateToHomepage = () => {
+    const token = localStorage.getItem('token');
+    console.log('Token:', token);
+    if (token) {
+      navigate('/homepage'); // Navigate to homepage if token exists
+    } else {
+      console.log('No token found, redirecting to login...');
+      navigate('/login'); // Redirect to login if no token
+      // navigate('/homepage'); 
+    }
   };
 
   return (
@@ -24,7 +42,14 @@ export default function Sidebar({
       <div className="p-6 border-b flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <Activity className="h-8 w-8 text-blue-600 flex-shrink-0" />
-          {isSidebarOpen && <h1 className="text-xl font-bold text-gray-900">Healthify</h1>}
+          {isSidebarOpen && (
+             <h1
+             className="text-xl font-bold text-gray-900 cursor-pointer"
+             onClick={handleNavigateToHomepage} // On click, navigate to homepage
+           >
+             {localStorage.getItem('token') ? 'Healthify' : 'Healthify'}
+           </h1>
+          )}
         </div>
         <button
           className="md:hidden block p-2 text-gray-600 rounded-full hover:bg-gray-100"
