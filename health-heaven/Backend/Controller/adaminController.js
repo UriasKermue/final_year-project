@@ -1,4 +1,5 @@
 const Admin = require("../models/Admin");
+const Doctor = require("../models/DdoctorModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { generateAndSendOTP } = require("../utils/otpService");
@@ -229,6 +230,98 @@ exports.deleteAdmin = async (req, res) => {
   } catch (error) {
     console.error("❌ Error deleting admin:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.getAllAdmins = async (req, res) => {
+  try {
+    const admins = await Admin.find({}, "-password"); // Exclude password field for security
+    res.json({ admins });
+  } catch (error) {
+    console.error("Error fetching admins:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.getAdminProfile = async (req, res) => {
+  try {
+    const adminId = req.user._id; // ✅ Extract _id instead of adminId
+
+    if (!adminId) {
+      return res.status(400).json({ message: "Admin ID missing in token." });
+    }
+
+    const admin = await Admin.findById(adminId).select("-password");
+
+    if (!admin) {
+      return res.status(404).json({ message: "Admin not found." });
+    }
+
+    res.json({ admin });
+  } catch (error) {
+    console.error("Error fetching admin profile:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.sendMailToDoctor = async (req, res) => {
+  try {
+    const { doctorEmail, subject, message } = req.body;
+
+    if (!doctorEmail || !subject || !message) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    // Call the existing sendEmail function
+    await sendEmail({
+      to: doctorEmail,
+      subject,
+      text: message,
+      htmlContent: `<p>${message}</p>`, // Optional: use HTML formatting
+    });
+
+    res.status(200).json({ message: "Email sent successfully" });
+  } catch (error) {
+    console.error("Error sending email:", error);
+    res.status(500).json({ message: "Failed to send email" });
+  }
+};
+
+exports.doctorDetail = async (req, res) => {
+  try {
+    const { id } = req.params; // Extract doctor ID from request parameters
+
+    const doctor = await Doctor.findById(id);
+    if (!doctor) {
+      return res.status(404).json({ message: "Doctor not found" });
+    }
+
+    res.status(200).json(doctor);
+  } catch (error) {
+    console.error("Error fetching doctor details:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+exports.sendCustomEmail = async (req, res) => {
+  try {
+    const { to, subject, message } = req.body;
+
+    if (!to || !subject || !message) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
+
+    await sendEmail({
+      to,
+      subject,
+      text: message, // Plain text
+      htmlContent: `<p>${message}</p>` // HTML version
+    });
+
+    res.status(200).json({ message: "Email sent successfully." });
+  } catch (error) {
+    console.error("Error sending email:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 

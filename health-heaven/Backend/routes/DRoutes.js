@@ -35,6 +35,8 @@ router.put("/profile", verifyToken, isDoctor, updateDoctorProfile);
 // ✅ Get Doctor's Appointments Route
 router.get("/appointments", verifyToken, isDoctor, getDoctorAppointments);
 
+// 
+
 // ✅ Update Appointment Status Route
 router.put("/appointment/:id", doctorMiddleware, updateAppointmentStatus);
 

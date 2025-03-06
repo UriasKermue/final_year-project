@@ -72,6 +72,7 @@ exports.registerUser = async (req, res) => {
     res.status(201).json({
       message: "User created successfully.",
       user: {
+        userId: newUser.userId,
         id: newUser._id,
         fullName: newUser.fullName,
         email: newUser.email,
