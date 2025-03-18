@@ -14,10 +14,9 @@ const DoctorList = () => {
       try {
         const response = await axios.get("http://localhost:5000/api/doctor/approved-doctors");
         setDoctors(response.data);
-        console.log(response.data);
-        setLoading(false);
       } catch (err) {
         setError("Error fetching doctors data");
+      } finally {
         setLoading(false);
       }
     };
@@ -35,9 +34,8 @@ const DoctorList = () => {
   return (
     <div style={styles.container}>
       <h2 className="text-3xl font-bold text-center text-blue-600 mb-6">
-      Meet Our Doctors
-    </h2>
-
+        Meet Our Doctors
+      </h2>
 
       {/* Search Input */}
       <div style={styles.searchContainer}>
@@ -63,12 +61,28 @@ const DoctorList = () => {
                 style={styles.image}
               />
               <div style={styles.info}>
-              <h3 className="text-blue-500 text-2xl font-bold mb-2">
-               <strong>{doctor.fullName}</strong>
-              </h3>
-                 <p><strong>Specialty:</strong> {doctor.specialty}</p>
+                <h3 className="text-blue-500 text-2xl font-bold mb-2">
+                  <strong>{doctor.fullName}</strong>
+                </h3>
+                <p><strong>Specialty:</strong> {doctor.specialty}</p>
                 <p><strong>Location:</strong> {doctor.location}</p>
                 <p><strong>Experience:</strong> {doctor.experience} years</p>
+                <p>
+  <strong>📆 </strong> 
+  {doctor.workingDays && doctor.workingDays.length > 0
+    ? doctor.workingDays.join(" ")
+    : "Not available"}
+</p>
+
+<p>
+  <strong>🧭 </strong>
+  {doctor.workingHours
+    ? `${doctor.workingHours.startTime} - ${doctor.workingHours.endTime}`
+    : "Not available"}
+</p>
+
+
+
                 <p><strong>Consultation Fees:</strong> ₹{doctor.fees}</p>
                 <Button
                   variant="contained"
@@ -94,10 +108,6 @@ const styles = {
     backgroundColor: "#f9f9f9",
     maxWidth: "1200px",
     margin: "0 auto",
-  },
-  heading: {
-    textAlign: "center",
-    marginBottom: "20px",
   },
   searchContainer: {
     textAlign: "center",
@@ -135,9 +145,6 @@ const styles = {
     objectFit: "cover",
     border: "4px solid #007bff",
     marginBottom: "15px",
-  },
-  info: {
-    textAlign: "center",
   },
   button: {
     marginTop: "15px",

@@ -8,7 +8,8 @@ import Dashboard from '../src/Pages/Dboard/Dashboard1';
 import HomePage from './Pages/HomePage';
 import AppointmentScheduler from './Components2/AppointmentScheduler';
 import MedicationReminder from './Components2/MedicationReminder';
-import MedicalRecord from './Components2/MedicalRecord';
+// import MedicalRecord from './Components2/Messenger';
+import Messenger from './Components2/Messenger';
 import Forgetpassword from './Pages/Forgetpassword';
 import VerifyOtpPage from './Pages/Dboard/pages/VerifyOtpPage'; 
 // import ResetPasswordPage from './Pages/Dboard/pagge/ResetPasswordPage';
@@ -21,7 +22,11 @@ import SignupPage from './Pages/SignupPage';
 import DoctorList from './Pages/DoctorList';
 import DiseasePrediction from './Pages/DiseasePrediction';
 import Start from './Pages/Start';
-
+import PostList from './Pages/Blog/PostList';
+import PostDetail from './Pages/Blog/PostDetail';
+// Chat or Messenger will be imported here
+import VideoCall from './Components2/Messenger/Videocall';
+import AudioCall from './Components2/Messenger/AudioCall';
 const App = () => {
   return (
     <Router>
@@ -34,7 +39,7 @@ const Main = () => {
   const location = useLocation();
 
   // Check if the current route should not display the Header and Footer
-  const isNoHeaderFooterPage = ['/', '/login', '/signup', '/forgetpassword', '/verifyOtppage', '/resetforgetpassword', '/dashboard1'].includes(location.pathname);
+  const isNoHeaderFooterPage = ['/', '/login', '/signup', '/forgetpassword', '/verifyOtppage', '/resetforgetpassword', '/dashboard1', '/messenger', '/videocall', 'audiocall'].includes(location.pathname);
 
   return (
     <>
@@ -53,7 +58,7 @@ const Main = () => {
           <Route path="/dashboard1" element={<Dashboard />} />
           <Route path="/appointments" element={<AppointmentScheduler />} />
           <Route path="/reminders" element={<MedicationReminder />} />
-          <Route path="/records" element={<MedicalRecord />} />
+          <Route path="/messenger" element={<Messenger />} />
           <Route path="/doctor" element={<DoctorList />} />
           <Route path="/education" element={<EducationResources />} />
           <Route path="/about" element={<AboutPage />} />
@@ -61,6 +66,17 @@ const Main = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/predictions" element={<DiseasePrediction />} />
+          {/* Blog Routes */}
+  {/* <Route path="/posts" element={<PostList />} />
+  <Route path="/posts/:postId" element={<PostDetail />} /> */}
+  <Route path="/posts" element={<PostList />} />
+  <Route path="/posts/:postId" element={<PostDetail />} />
+
+  {/* Chat components routes come below */}
+  {/* <Route path="/messenger" element={<Messenger />} /> */}
+<Route path="/video-call" element={<VideoCall />} />
+<Route path="/audio-call" element={<AudioCall />} />
+          
         </Routes>
       </main>
       {!isNoHeaderFooterPage && <Footer />}

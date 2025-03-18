@@ -64,12 +64,19 @@ const AppointmentManagement: React.FC<AppointmentManagementProps> = ({ darkMode 
     fetchAppointments();
   }, []);
 
-  const filteredAppointments = appointments.filter(appointment => 
-    appointment.user?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    appointment.doctor?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    appointment.date?.includes(searchTerm) ||
-    appointment.appointmentId?.toString().includes(searchTerm)
-  );
+  const filteredAppointments = appointments.filter(appointment => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      // Safely check user name
+      (appointment.user?.fullName?.toLowerCase().includes(searchLower) ?? false) ||
+      // Safely check doctor name
+      (appointment.doctor?.fullName?.toLowerCase().includes(searchLower) ?? false) ||
+      // Check date
+      (appointment.date?.toLowerCase().includes(searchLower) ?? false) ||
+      // Check appointment ID
+      (appointment.appointmentId?.toString().includes(searchTerm) ?? false)
+    );
+  });
 
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gray-50'} p-6`}>
@@ -151,7 +158,7 @@ const AppointmentManagement: React.FC<AppointmentManagementProps> = ({ darkMode 
                       {appointment.user?.fullName || 'N/A'}
                     </td>
                     <td className={`px-6 py-4 text-sm ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                      {appointment.doctor.fullName}
+                      {appointment.doctor?.fullName || 'N/A'}
                     </td>
                     <td className={`px-6 py-4 text-sm ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                       <div className="flex items-center gap-1.5">

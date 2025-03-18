@@ -21,9 +21,10 @@ const NewauthMiddleware = async (req, res, next) => {
     }
 
     // ✅ Ensure the user is active
-    if (user.status !== "active") {
-      return res.status(403).json({ message: "Access denied. User is inactive or blocked" });
+    if (user.status.toLowerCase() !== "active") { 
+      return res.status(403).json({ message: `Access denied. User is ${user.status}` });
     }
+    
 
     // ✅ Attach the user to the request object
     req.user = user;

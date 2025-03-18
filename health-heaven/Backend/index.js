@@ -17,6 +17,7 @@ const connectDB = require('../Backend/DB'); // DB connection
 const connectCloudinary = require('./config/cloudinary');
 const dRoutes = require('./routes/DRoutes');
 const adminRoutes =   require("./routes/adminRoutes");
+const blogRoutes = require("./routes/blogRoutes");
 // const superAdminRoutes = require("./routes/superAdmin");
 
 const app = express();
@@ -38,6 +39,7 @@ app.use('/api', reminderRoutes);
 app.use('/api/medical-records', medicalRecordRoutes);
 app.use("/api", predictionRoutes);
 app.use('/api/password', passwordRoutes); 
+app.use('/api/blog', blogRoutes);
 console.log(`MONGO_URI: ${process.env.MONGO_URI}`);
 console.log(`PORT: ${process.env.PORT}`);
 

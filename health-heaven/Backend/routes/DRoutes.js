@@ -10,6 +10,8 @@ const {
   getDoctorAppointments,
   updateAppointmentStatus,
   getAllApprovedDoctors,
+  updateAvailability,
+  getDoctorProfile
 } = require("../Controller/Ddcontroller"); // ✅ Ensure all functions are imported
 
 const { upload } = require("../middlewares/multer");
@@ -32,10 +34,16 @@ router.get("/approved-doctors", getAllApprovedDoctors);
 // ✅ Update Doctor Profile Route
 router.put("/profile", verifyToken, isDoctor, updateDoctorProfile);
 
+router.get("/get-profile" , getDoctorProfile);
+
 // ✅ Get Doctor's Appointments Route
 router.get("/appointments", verifyToken, isDoctor, getDoctorAppointments);
 
 // 
+
+router.put("/update-availability", verifyToken, isDoctor, updateAvailability);
+
+
 
 // ✅ Update Appointment Status Route
 router.put("/appointment/:id", doctorMiddleware, updateAppointmentStatus);

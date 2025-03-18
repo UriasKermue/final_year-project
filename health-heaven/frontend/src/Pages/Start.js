@@ -28,7 +28,7 @@ function Start() {
             <div className="bg-black bg-opacity-50 w-full h-full flex items-center justify-center">
               <div className="text-center text-white px-4 relative z-10">
                 <Heart className="w-16 h-16 mx-auto mb-6 text-rose-500" />
-                <h1 className="text-5xl font-bold mb-4">Health Heaven</h1>
+                <h1 className="text-5xl font-bold mb-4">Healthify Solutions</h1>
                 <p className="text-xl max-w-2xl mx-auto">Your journey to wellness begins here</p>
                 <div className="mt-8">
                   <Link

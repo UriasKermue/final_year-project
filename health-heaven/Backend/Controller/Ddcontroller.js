@@ -169,7 +169,7 @@ exports.getAllApprovedDoctors = async (req, res) => {
   try {
     // ✅ Fetch only approved doctors
     const approvedDoctors = await Ddoctor.find({ status: "Approved" }).select(
-      "fullName email phone specialty experience hospitalAffiliation profilePictureUrl fees location "
+      "fullName email phone specialty experience hospitalAffiliation profilePictureUrl fees location workingDays workingHours"
     );
 
     // ✅ Check if no approved doctors are found
@@ -198,6 +198,8 @@ exports.updateDoctorProfile = async (req, res) => {
       certificateUrl,
       govIDUrl,
       profilePictureUrl,
+      workingDays,
+      workingHours,
     } = req.body;
 
     // ✅ Prevent status update
@@ -212,6 +214,8 @@ exports.updateDoctorProfile = async (req, res) => {
         certificateUrl,
         govIDUrl,
         profilePictureUrl,
+        workingDays,
+        workingHours,
       },
       { new: true, runValidators: true }
     );
@@ -285,5 +289,60 @@ exports.updateAppointmentStatus = async (req, res) => {
   } catch (error) {
     console.error("Error updating appointment:", error);
     res.status(500).json({ message: "Error updating appointment", error: error.message });
+  }
+};
+
+// ✅ Update Doctor Availability
+
+exports.updateAvailability = async (req, res) => {
+  try {
+    const { workingDays, startTime, endTime, lunchBreak } = req.body;
+    
+    // ✅ Ensure "Doctor" is defined
+    const doctor = await Ddoctor.findById(req.user._id); // ✅ FIXED: Use "Ddoctor"
+
+    if (!doctor) {
+      return res.status(404).json({ message: "Doctor not found" });
+    }
+    
+    if (doctor.status !== "Approved") {
+      return res.status(403).json({ message: "You must be approved to update availability" });
+    }
+
+    // ✅ Update fields
+    if (workingDays) doctor.workingDays = workingDays;
+    if (startTime && endTime) doctor.workingHours = { startTime, endTime };
+    if (lunchBreak) doctor.lunchBreak = lunchBreak;
+
+    await doctor.save();
+    res.json({ message: "Availability updated successfully", doctor });
+  } catch (error) {
+    console.error("Error updating availability:", error);
+    res.status(500).json({ message: "Error updating availability", error: error.message });
+  }
+};
+
+exports.getDoctorProfile = async (req, res) => {
+  try {
+    console.log("Auth Header:", req.header("Authorization"));
+
+    const authHeader = req.header("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(400).json({ message: "Invalid token format" });
+    }
+
+    const token = authHeader.split(" ")[1];
+    console.log("Extracted Token:", token);
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("Decoded Token:", decoded);
+
+    const doctor = await Ddoctor.findById(decoded.id).select("-password");
+    if (!doctor) return res.status(404).json({ message: "Doctor not found" });
+
+    res.json(doctor);
+  } catch (error) {
+    console.error("Error:", error.message);
+    res.status(401).json({ message: "Unauthorized", error: error.message });
   }
 };
