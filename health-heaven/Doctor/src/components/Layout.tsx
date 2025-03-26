@@ -45,7 +45,7 @@ export default function Layout() {
   // Logout function
   const handleLogout = () => {
     localStorage.removeItem("doctorToken");
-    navigate("/Doctorlogin");
+    navigate("/");
   };
 
   return (
@@ -65,16 +65,12 @@ export default function Layout() {
         {/* Sidebar Links */}
         <nav className="mt-6">
           {[
-            { title: "Dashboard", icon: Home, path: "/" },
-            { title: "Appointments", icon: Calendar, path: "/appointments" },
-            { title: "Profile", icon: Users, path: "/profile" },
-
-            // { title: "Patients", icon: Users, path: "/patients" },
-            // { title: "Prescriptions", icon: Pill, path: "/prescriptions" },
-            // { title: "Medical Records", icon: FileText, path: "/records" },
-            { title: "Messages", icon: MessageSquare, path: "/messages", notifications: 4 },
-            { title: "Add Blog", icon: FileText, path: "/addblog" },
-            { title: "Blog List", icon: FileText, path: "/bloglist" },
+             { title: "Dashboard", icon: Home, path: "/dashboard" }, 
+             { title: "Appointments", icon: Calendar, path: "/dashboard/appointments" },
+             { title: "Profile", icon: Users, path: "/dashboard/profile" },
+             { title: "Messages", icon: MessageSquare, path: "/dashboard/messages", notifications: 4 },
+             { title: "Add Blog", icon: FileText, path: "/dashboard/addblog" },
+             { title: "Blog List", icon: FileText, path: "/dashboard/bloglist" }
           ].map((item) => (
             <Link key={item.path} to={item.path} className={`flex items-center px-4 py-3 mb-1 mx-2 rounded-lg transition-colors ${
                 location.pathname === item.path ? "bg-blue-50 text-blue-600" : "text-gray-600 hover:bg-gray-50"
@@ -141,7 +137,7 @@ export default function Layout() {
                 <Settings className="h-6 w-6" />
               </button>
               <div className="h-6 w-px bg-gray-200"></div>
-              <Link to="/profile" className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded-lg transition-colors">
+              <Link to="/dashboard/profile" className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded-lg transition-colors">
                 <img className="h-8 w-8 rounded-full" src={profile?.profilePictureUrl} alt="Profile" />
                 <MoreVertical className="h-5 w-5 text-gray-500" />
               </Link>

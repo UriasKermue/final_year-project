@@ -34,7 +34,7 @@ router.get("/approved-doctors", getAllApprovedDoctors);
 // ✅ Update Doctor Profile Route
 router.put("/profile", verifyToken, isDoctor, updateDoctorProfile);
 
-router.get("/get-profile" , getDoctorProfile);
+router.get("/profile" , getDoctorProfile);
 
 // ✅ Get Doctor's Appointments Route
 router.get("/appointments", verifyToken, isDoctor, getDoctorAppointments);

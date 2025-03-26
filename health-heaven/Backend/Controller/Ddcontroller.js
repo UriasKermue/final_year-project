@@ -1,8 +1,11 @@
+const mongoose = require("mongoose");
 const Appointment = require("../models/AppointmentModel");
+const Chat = require("../models/Chat");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("../utils/sendEmail");
 const Ddoctor = require("../models/DdoctorModel");
+// const Chat = require("../models/chatModel");
 const cloudinary = require("cloudinary").v2;
 const {
   doctorRegistrationTemplate,
@@ -239,7 +242,7 @@ exports.getDoctorAppointments = async (req, res) => {
   try {
     const appointments = await Appointment.find({
       doctor: req.user.id,
-    }).populate("user", "fullName email phone");
+    }).populate("user", "fullName email phone profileImage");
     res.json(appointments);
   } catch (error) {
     res
@@ -248,7 +251,107 @@ exports.getDoctorAppointments = async (req, res) => {
   }
 };
 
-// ✅ Approve or Reject Appointment
+// // ✅ Approve or Reject Appointment
+// exports.updateAppointmentStatus = async (req, res) => {
+//   try {
+//     const { status } = req.body;
+
+//     // ✅ Allow only "Approved" or "Rejected"
+//     if (!["Approved", "Rejected"].includes(status)) {
+//       return res.status(400).json({ message: "Invalid status update" });
+//     }
+
+//     // ✅ Fetch appointment by ID
+//     const appointment = await Appointment.findById(req.params.id);
+//     if (!appointment) {
+//       return res.status(404).json({ message: "Appointment not found" });
+//     }
+
+//     // 🛑 Debugging logs to check IDs
+//     console.log("🔹 Doctor ID from Token:", req.user.id);
+//     console.log("🔹 Doctor ID in Appointment:", appointment.doctor.toString());
+
+//     // ✅ Ensure only the assigned doctor can update the status
+//     if (String(appointment.doctor) !== String(req.user.id)) {
+//       return res.status(403).json({ message: "Unauthorized to modify this appointment" });
+//     }
+
+//     // ✅ Update appointment status
+//     appointment.status = status;
+//     await appointment.save();
+
+//     // ✅ Notify user about appointment status
+//     await sendEmail({
+//       to: appointment.user.email,
+//       subject: "Your Appointment Status",
+//       text: `Your appointment has been ${status}.`,
+//       htmlContent: `<p>Your appointment has been <strong>${status}</strong>.</p>`,
+//     });
+
+//     res.json({ message: `Appointment ${status} successfully` });
+//   } catch (error) {
+//     console.error("Error updating appointment:", error);
+//     res.status(500).json({ message: "Error updating appointment", error: error.message });
+//   }
+// };
+
+// exports.updateAppointmentStatus = async (req, res) => {
+//   try {
+//     const { status } = req.body;
+
+//     // ✅ Allow only "Approved" or "Rejected"
+//     if (!["Approved", "Rejected"].includes(status)) {
+//       return res.status(400).json({ message: "Invalid status update" });
+//     }
+
+//     // ✅ Fetch appointment by ID
+//     const appointment = await Appointment.findById(req.params.id)
+//       .populate("user") // Get user details
+//       .populate("doctor"); // Get doctor details
+
+//     if (!appointment) {
+//       return res.status(404).json({ message: "Appointment not found" });
+//     }
+
+//     // ✅ Ensure only the assigned doctor can update the status
+//     if (String(appointment.doctor._id) !== String(req.user.id)) {
+//       return res.status(403).json({ message: "Unauthorized to modify this appointment" });
+//     }
+
+//     // ✅ Update appointment status
+//     appointment.status = status;
+//     await appointment.save();
+
+//     // ✅ If appointment is approved, create a chat if it doesn’t exist
+//     if (status === "Approved") {
+//       let chat = await Chat.findOne({
+//         participants: { $all: [appointment.user._id, appointment.doctor._id] },
+//       });
+
+//       if (!chat) {
+//         chat = new Chat({
+//           participants: [appointment.user._id, appointment.doctor._id],
+//           chatName: `Chat with Dr. ${appointment.doctor.name}`, // Modify based on your doctor schema
+//         });
+//         await chat.save();
+//       }
+//     }
+
+//     // ✅ Notify user about appointment status
+//     await sendEmail({
+//       to: appointment.user.email,
+//       subject: "Your Appointment Status",
+//       text: `Your appointment has been ${status}.`,
+//       htmlContent: `<p>Your appointment has been <strong>${status}</strong>.</p>`,
+//     });
+
+//     res.json({ message: `Appointment ${status} successfully`, appointment });
+//   } catch (error) {
+//     console.error("Error updating appointment:", error);
+//     res.status(500).json({ message: "Error updating appointment", error: error.message });
+//   }
+// };
+
 exports.updateAppointmentStatus = async (req, res) => {
   try {
     const { status } = req.body;
@@ -259,23 +362,49 @@ exports.updateAppointmentStatus = async (req, res) => {
     }
 
     // ✅ Fetch appointment by ID
-    const appointment = await Appointment.findById(req.params.id);
+    const appointment = await Appointment.findById(req.params.id)
+      .populate("user") // Get user details
+      .populate("doctor"); // Get doctor details
+
     if (!appointment) {
       return res.status(404).json({ message: "Appointment not found" });
     }
 
-    // 🛑 Debugging logs to check IDs
-    console.log("🔹 Doctor ID from Token:", req.user.id);
-    console.log("🔹 Doctor ID in Appointment:", appointment.doctor.toString());
-
     // ✅ Ensure only the assigned doctor can update the status
-    if (String(appointment.doctor) !== String(req.user.id)) {
+    if (String(appointment.doctor._id) !== String(req.user.id)) {
       return res.status(403).json({ message: "Unauthorized to modify this appointment" });
     }
 
     // ✅ Update appointment status
     appointment.status = status;
     await appointment.save();
+
+    // ✅ If appointment is approved, create a chat if it doesn’t exist
+    if (status === "Approved") {
+      console.log("🔍 Checking if chat exists...");
+
+      const userId = new mongoose.Types.ObjectId(appointment.user._id);
+      const doctorId = new mongoose.Types.ObjectId(appointment.doctor._id);
+
+      let chat = await Chat.findOne({
+        participants: { $all: [userId, doctorId] },
+      });
+
+      if (!chat) {
+        console.log("⚡ No chat found, creating a new one...");
+
+        chat = new Chat({
+          participants: [userId, doctorId],
+          chatName: `Chat with ${appointment.doctor.fullName}`, // ✅ Use fullName
+        });
+        
+
+        await chat.save();
+        console.log("✅ Chat created successfully:", chat);
+      } else {
+        console.log("✅ Chat already exists:", chat);
+      }
+    }
 
     // ✅ Notify user about appointment status
     await sendEmail({
@@ -285,7 +414,7 @@ exports.updateAppointmentStatus = async (req, res) => {
       htmlContent: `<p>Your appointment has been <strong>${status}</strong>.</p>`,
     });
 
-    res.json({ message: `Appointment ${status} successfully` });
+    res.json({ message: `Appointment ${status} successfully`, appointment });
   } catch (error) {
     console.error("Error updating appointment:", error);
     res.status(500).json({ message: "Error updating appointment", error: error.message });

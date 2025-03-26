@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const upload = require("../middlewares/uploadMiddleware");
+const {upload}= require("../middlewares/multer");
 const NewauthMiddleware = require("../middlewares/NewauthMiddleware");
 const { isAdmin } = require("../middlewares/roleMiddleware"); // ✅ Updated import
 const {
@@ -18,7 +18,7 @@ router.post("/login", loginUser);
 
 // ✅ Fetch authenticated user's details (Active users only)
 router.get("/user", NewauthMiddleware, getUserProfile);
-
+// router.get("/available-slots", getAvailableSlots);
 // ✅ Update user status (Admin or SuperAdmin only)
 router.put("/status/:id", isAdmin, updateUserStatus);
 

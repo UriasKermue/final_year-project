@@ -36,10 +36,14 @@ const authMiddleware = (req, res, next) => {
     console.log("Decoded Token:", decoded); // 🛑 Debugging log
 
     // Ensure the token contains adminId
-    if (!decoded.adminId) {
-      return res.status(400).json({ message: "Invalid token payload: adminId missing" });
-    }
+    // if (!decoded.adminId) {
+    //   return res.status(400).json({ message: "Invalid token payload: adminId missing" });
+    // }
 
+    if (!decoded.adminId && !decoded.userId && !decoded.doctorId) {
+      return res.status(400).json({ message: "Invalid token payload: Missing user/doctor/admin ID" });
+    }
+    
     req.user = {
       adminId: decoded.adminId, // ✅ Corrected to match your OTP function
       username: decoded.username,

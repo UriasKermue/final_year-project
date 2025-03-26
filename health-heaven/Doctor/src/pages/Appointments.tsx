@@ -27,6 +27,7 @@ export default function Appointments() {
 
         const data = await response.json();
         setAppointments(data);
+        console.log(data);
       } catch (error) {
         console.error("Error fetching appointments:", error);
         alert(error.message);
@@ -133,7 +134,7 @@ export default function Appointments() {
                     {appointment.user ? (
                       <>
                         <img
-                          src={appointment.user.image}
+                          src={appointment.user.profileImage}
                           alt="Patient"
                           className="w-10 h-10 rounded-full mr-3 border border-gray-300"
                         />

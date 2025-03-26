@@ -524,16 +524,24 @@ const DoctorRegistrationForm: React.FC = () => {
         </div>
 
         <div className="flex justify-end mt-6">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className={`px-6 py-3 bg-blue-600 text-white font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors ${
-              isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-700'
-            }`}
-          >
-            {isSubmitting ? 'Submitting...' : 'Complete Registration'}
-          </button>
-        </div>
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className={`px-6 py-3 bg-blue-600 text-white font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors ${
+          isSubmitting ? "opacity-70 cursor-not-allowed" : "hover:bg-blue-700"
+        }`}
+      >
+        {isSubmitting ? "Submitting..." : "Complete Registration"}
+      </button>
+
+      <button
+        type="button"
+        onClick={() => navigate("/")}
+        className="ml-4 px-6 py-3 bg-gray-300 text-gray-800 font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-colors hover:bg-gray-400"
+      >
+        Go to Login
+      </button>
+    </div>
       </form>
     </div>
   );

@@ -38,7 +38,7 @@ const LoginPage = () => {
       localStorage.setItem('token', token);
 
       // Navigate to dashboard on successful login
-      navigate('/dashboard1');
+      navigate('/homepage');
     } catch (error) {
       console.error('Login Error:', error); // Log error details to console
       setError(error.response ? error.response.data.message : 'Error logging in');

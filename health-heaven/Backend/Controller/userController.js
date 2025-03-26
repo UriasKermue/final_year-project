@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const Newuser = require("../models/Newuser");
 const sendEmail = require("../utils/sendEmail");
 const welcomeEmail = require("../utils/welcomeTemplate");
+const cloudinary = require("cloudinary").v2;
 // ✅ Register User
 exports.registerUser = async (req, res) => {
   try {
@@ -34,10 +35,19 @@ exports.registerUser = async (req, res) => {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Get the profile image URL if uploaded
-    const profileImage = req.file
-      ? `/uploads/users/${req.file.filename}`
-      : null;
+    // Upload profile image to Cloudinary (if provided)
+    let profileImageUrl = null;
+    if (req.file) {
+      try {
+        const uploadedImage = await cloudinary.uploader.upload(req.file.path, {
+          folder: "users_profiles",
+        });
+        profileImageUrl = uploadedImage.secure_url;
+      } catch (error) {
+        console.error("Cloudinary Upload Error:", error.message);
+        return res.status(500).json({ message: "Error uploading image." });
+      }
+    }
 
     // Create a new user with default status "Active"
     const newUser = new Newuser({
@@ -49,7 +59,7 @@ exports.registerUser = async (req, res) => {
       address,
       allergies,
       chronicConditions,
-      profileImage,
+      profileImage: profileImageUrl,
       password: hashedPassword,
       status: "Active", // Default status
     });
@@ -58,33 +68,28 @@ exports.registerUser = async (req, res) => {
     await newUser.save();
     const welcomeMessage = welcomeEmail(fullName);
 
-
-    // ✅ Send the welcome email
+    // Send the welcome email
     await sendEmail({
       to: email,
       subject: "Welcome to Our Platform!",
       text: welcomeMessage.text,
       html: welcomeMessage.htmlContent,
     });
-   
 
     // Return response with user details
     res.status(201).json({
       message: "User created successfully.",
       user: {
-        userId: newUser.userId,
         id: newUser._id,
         fullName: newUser.fullName,
         email: newUser.email,
         profileImage: newUser.profileImage,
-        status: newUser.status, // Include user status
+        status: newUser.status,
       },
     });
   } catch (error) {
     console.error("Error creating user:", error.message);
-    res
-      .status(500)
-      .json({ message: "Error creating user.", error: error.message });
+    res.status(500).json({ message: "Error creating user.", error: error.message });
   }
 };
 
@@ -157,7 +162,7 @@ exports.getUserProfile = async (req, res) => {
     }
 
     // Fetch user data from the database
-    const user = await Newuser.findById(req.user.userId).select(
+    const user = await Newuser.findById(req.user._id).select(
       "fullName email age bloodType phone address allergies chronicConditions profileImage status"
     );
 

@@ -1,4 +1,3 @@
-// DoctorLogin.tsx
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -70,9 +69,8 @@ const DoctorLogin: React.FC = () => {
       // Store token in localStorage with a consistent key
       localStorage.setItem("token", result.token);
 
-      // Navigate to Dashboard with correct path
-      // navigate("/dashboard");
-      navigate("/layout");
+      // Navigate to Doctor Dashboard
+      navigate("/dashboard");
     } catch (error) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
@@ -134,11 +132,11 @@ const DoctorLogin: React.FC = () => {
         </form>
 
         <p className="mt-4 text-center">
-          Don't have an account?{" "}
-          <Link to="/doctorregistration" className="text-blue-600 hover:underline">
-            Register here
-          </Link>
-        </p>
+  Don't have an account?{" "}
+  <Link to="/doctorregistration" className="text-blue-600 hover:underline">
+    Register here
+  </Link>
+</p>
       </div>
     </div>
   );

@@ -265,7 +265,7 @@ const PatientManagement: React.FC<PatientManagementProps> = ({ darkMode }) => {
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <img
-                          src={`http://localhost:5000${patient.profileImage}`}
+                          src={patient.profileImage}
                           alt={patient.fullName}
                           className="w-10 h-10 rounded-full object-cover"
                         />
@@ -365,7 +365,7 @@ const PatientManagement: React.FC<PatientManagementProps> = ({ darkMode }) => {
               {/* Left Column - Basic Info */}
               <div className="space-y-4">
                 <img
-                  src={`http://localhost:5000${selectedPatient.profileImage}`}
+                  src={selectedPatient.profileImage}
                   alt={selectedPatient.fullName}
                   className="w-full h-48 rounded-lg object-cover"
                 />
